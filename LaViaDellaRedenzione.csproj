@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+   La Via della Redenzione — LaViaDellaRedenzione.csproj
+   Package : com.refa.valdrath
+
+   Target platforms:
+     Android : minSdk 26, targetSdk 34 → .apk (sideload) + .aab (Play Store)
+     Windows : net8.0-windows10.0.19041.0 → .msi (WiX)
+
+   Struttura cartelle:
+     /Core      — logica pura (nessuna dipendenza UI/piattaforma)
+     /Data      — classi dati serializzabili JSON
+     /Systems   — GameManager, SaveSystem, AudioSystem, ecc.
+     /Screens   — una classe per schermata
+     /UI        — componenti UI riutilizzabili (VirtualDPad, InputHintBar, ecc.)
+     /Platforms — codice specifico per piattaforma
+     /Assets    — sprite, audio, JSON dati, localizzazione
+
+   Dipendenze:
+     - .NET MAUI        : UI cross-platform
+     - Newtonsoft.Json  : serializzazione SaveData (più robusto di System.Text.Json
+                          per dati di gioco con polimorfismo e migration)
+     - Plugin.Maui.Audio: riproduzione BGM e SFX (Android + Windows)
+     - Plugin.LocalNotification: notifiche Android opzionali
+
+   Build:
+     dotnet build  -f net8.0-android -c Release  → .apk / .aab
+     dotnet build  -f net8.0-windows10.0.19041.0 -c Release → .exe + .msi
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       PROPRIETÀ GENERALI
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <PropertyGroup>
+    <ApplicationTitle>La Via della Redenzione</ApplicationTitle>
+    <ApplicationId>com.refa.valdrath</ApplicationId>
+
+    <!-- Target frameworks multi-platform -->
+    <TargetFrameworks>net8.0-android;net8.0-windows10.0.19041.0</TargetFrameworks>
+
+    <!-- Versione applicazione — aggiornata da GitHub Actions via VERSION.txt -->
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>0.1.0</ApplicationDisplayVersion>
+
+    <!-- Linguaggio e nullable -->
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- MAUI -->
+    <UseMaui>true</UseMaui>
+    <RootNamespace>LaViaDellaRedenzione</RootNamespace>
+    <AssemblyName>LaViaDellaRedenzione</AssemblyName>
+
+    <!-- Icona e splash screen -->
+    <MauiIcon Include="Resources/AppIcon/appicon.svg"
+              ForegroundFile="Resources/AppIcon/appiconfg.svg"
+              Color="#1A1A2A" />
+    <MauiSplashScreen Include="Resources/Splash/splash.svg"
+                      Color="#1A1A2A"
+                      BaseSize="128,128" />
+
+    <!-- Font personalizzati -->
+    <MauiFont Include="Resources/Fonts/*.ttf" />
+    <MauiFont Include="Resources/Fonts/*.otf" />
+
+    <!-- Asset di gioco — inclusi come MauiAsset per FileSystem.OpenAppPackageFileAsync -->
+    <MauiAsset Include="Assets/**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       CONFIGURAZIONE ANDROID
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
+    <TargetSdkVersion>34</TargetSdkVersion>
+
+    <!-- Orientamento fisso portrait — la battle screen e il side-scroll
+         sono progettati per portrait su Android -->
+    <AndroidManifestPlaceholders>screenOrientation=portrait</AndroidManifestPlaceholders>
+
+    <!-- Accelerazione hardware obbligatoria per il GameLoop a 60 FPS -->
+    <AndroidHardwareAccelerated>true</AndroidHardwareAccelerated>
+
+    <!-- Compressione AOT per ridurre il tempo di avvio su Android -->
+    <RunAOTCompilation Condition="'$(Configuration)' == 'Release'">true</RunAOTCompilation>
+
+    <!-- Linker aggressivo in Release per ridurre dimensioni APK -->
+    <AndroidLinkMode Condition="'$(Configuration)' == 'Release'">SdkOnly</AndroidLinkMode>
+    <AndroidLinkMode Condition="'$(Configuration)' == 'Debug'">None</AndroidLinkMode>
+
+    <!-- Formato pacchetto — sovrascritto da GitHub Actions:
+         -p:AndroidPackageFormat=apk   per sideload/test
+         -p:AndroidPackageFormat=aab   per Google Play -->
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+
+    <!-- Firma — le credenziali arrivano da GitHub Secrets in CI,
+         da variabili d'ambiente in locale. Non committare mai il keystore. -->
+    <AndroidKeyStore Condition="'$(KEYSTORE_BASE64)' != ''">true</AndroidKeyStore>
+    <AndroidSigningKeyStore Condition="'$(ANDROID_KEYSTORE_PATH)' != ''">
+      $(ANDROID_KEYSTORE_PATH)
+    </AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias Condition="'$(KEY_ALIAS)' != ''">$(KEY_ALIAS)</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass Condition="'$(KEY_PASSWORD)' != ''">$(KEY_PASSWORD)</AndroidSigningKeyPass>
+    <AndroidSigningStorePass Condition="'$(STORE_PASSWORD)' != ''">$(STORE_PASSWORD)</AndroidSigningStorePass>
+
+    <!-- Bundle splitting: separate ABI per ridurre dimensioni download -->
+    <AndroidCreatePackagePerAbi Condition="'$(Configuration)' == 'Release'">false</AndroidCreatePackagePerAbi>
+
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       CONFIGURAZIONE WINDOWS
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+
+    <!-- Standalone EXE — WiX lo impacchetta in .msi separatamente -->
+    <WindowsPackageType>None</WindowsPackageType>
+    <SelfContained>true</SelfContained>
+
+    <!-- Dimensione minima finestra: 1280x720 (impostata in App.xaml.cs) -->
+    <ApplicationManifest>Platforms\Windows\app.manifest</ApplicationManifest>
+
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       CONFIGURAZIONE DEBUG
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>DEBUG;TRACE;GAME_DEBUG</DefineConstants>
+    <!-- GAME_DEBUG attiva: FPS overlay, Debug Menu, logging verboso -->
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DefineConstants>RELEASE;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       DIPENDENZE NuGet
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <ItemGroup>
+
+    <!-- MAUI workload — già incluso dalla SDK, qui per chiarezza -->
+    <PackageReference Include="Microsoft.Maui.Controls"
+                      Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility"
+                      Version="$(MauiVersion)" />
+
+    <!-- Serializzazione JSON per SaveSystem e CardDatabase.
+         Newtonsoft usato per TypeNameHandling e migration flessibile. -->
+    <PackageReference Include="Newtonsoft.Json"
+                      Version="13.0.3" />
+
+    <!-- Audio cross-platform: BGM (OGG/MP3) e SFX.
+         Supporta Android AudioManager e Windows MediaFoundation. -->
+    <PackageReference Include="Plugin.Maui.Audio"
+                      Version="3.0.0" />
+
+    <!-- Notifiche locali Android (promemoria giornalieri opzionali) -->
+    <PackageReference Include="Plugin.LocalNotification"
+                      Version="11.1.2"
+                      Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
+
+    <!-- Community Toolkit MAUI — animazioni, comportamenti UI, converter -->
+    <PackageReference Include="CommunityToolkit.Maui"
+                      Version="7.0.1" />
+
+    <!-- Community Toolkit MVVM — per ViewModel leggeri nelle schermate UI -->
+    <PackageReference Include="CommunityToolkit.Mvvm"
+                      Version="8.2.2" />
+
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       FILE SPECIFICI PER PIATTAFORMA
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Android: solo i file nella cartella Platforms/Android/ -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <Compile Include="Platforms\Android\**\*.cs" />
+    <Compile Remove="Platforms\Windows\**\*.cs" />
+  </ItemGroup>
+
+  <!-- Windows: solo i file nella cartella Platforms/Windows/ -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+    <Compile Include="Platforms\Windows\**\*.cs" />
+    <Compile Remove="Platforms\Android\**\*.cs" />
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       STRUTTURA CARTELLE — cartelle vuote tracciate con .gitkeep
+       (rimuovere quando i file vengono aggiunti)
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <ItemGroup>
+    <None Include="Assets\Data\.gitkeep" />
+    <None Include="Assets\Sprites\.gitkeep" />
+    <None Include="Assets\Audio\.gitkeep" />
+    <None Include="Assets\Localization\.gitkeep" />
+    <None Include="Assets\Backgrounds\.gitkeep" />
+  </ItemGroup>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       RISORSE MAUI
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <ItemGroup>
+    <!-- Raw assets non processati da MAUI (JSON, audio, sprite) -->
+    <MauiAsset Include="Assets\**\*.*"
+               LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>
