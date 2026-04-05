@@ -1,0 +1,475 @@
+[
+  {
+    "id": "CARD_KAEL_SLASH_001",
+    "name": "Taglio del Disertore",
+    "description": "Un attacco potente carico di vergogna. Infligge danno elevato ma logora il morale.",
+    "flavorText": "La lama era pulita. L'uomo che la impugnava non lo era altrettanto.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 2,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["spada", "kael", "vergogna", "fisico"],
+    "artworkPath": "Cards/kael_slash.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 1.8 + 15",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Stato",
+        "target": "Self",
+        "statusEffect": "Depresso",
+        "statusDuration": 2,
+        "statusIntensity": 0.9,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_DISCIPLINE_002",
+    "name": "Disciplina Militare",
+    "description": "Anni di addestramento imperiale riaffiorano. Potenzia l'attacco per 2 turni, ma solo se ancora in piedi.",
+    "flavorText": "Il corpo ricorda quello che la mente vorrebbe dimenticare.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["buff", "kael", "militare", "autodisciplina"],
+    "artworkPath": "Cards/kael_discipline.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 0.3",
+        "statusEffect": "Potenziato",
+        "statusDuration": 2,
+        "statusIntensity": 1.3,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_OATH_003",
+    "name": "Giuramento Spezzato",
+    "description": "Il dolore di chi è rimasto solo alimenta il colpo. Più potente quando un alleato è caduto.",
+    "flavorText": "Il guanto sinistro nasconde la cicatrice. Il cuore no.",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Ombra",
+    "spCost": 3,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 3,
+    "tags": ["spada", "kael", "greypass", "ombra", "alleato"],
+    "artworkPath": "Cards/kael_oath.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 2.2 + 30",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_RETREAT_004",
+    "name": "Ritirata Strategica",
+    "description": "Arretra con tattica. Recupera SP e si prepara, ma abbassa le difese.",
+    "flavorText": "Non era paura. Si era detto così per anni.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["difesa", "kael", "sp", "ritirata"],
+    "artworkPath": "Cards/kael_retreat.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "baseValue": 2,
+        "scalingFormula": "",
+        "statusEffect": "Protetto",
+        "statusDuration": 1,
+        "statusIntensity": 0.7,
+        "statusChance": 1.0
+      },
+      {
+        "effectType": "Stato",
+        "target": "Self",
+        "statusEffect": "Rallentato",
+        "statusDuration": 1,
+        "statusIntensity": 0.85,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_RANK_005",
+    "name": "Gallon Strappato",
+    "description": "Rimuove un debuff da sé stesso. L'efficacia cresce col livello.",
+    "flavorText": "I galloni erano stati strappati via con precisione — non i bottoni, non le cuciture.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["cleanse", "kael", "debuff", "militare"],
+    "artworkPath": "Cards/kael_rank.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "baseValue": 0,
+        "scalingFormula": "LVL * 3",
+        "statusEffect": "Ancorato",
+        "statusDuration": 1,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_LASTWATCH_006",
+    "name": "L'Ultima Veglia",
+    "description": "Attacco oscuro che colpisce tutti i nemici. Il costo è alto quanto la posta.",
+    "flavorText": "Quella notte aveva passato il turno di guardia a guardare le braci.",
+    "cardType": "Abilita",
+    "cardRarity": "Rara",
+    "elementType": "Ombra",
+    "spCost": 4,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 8,
+    "tags": ["area", "kael", "ombra", "greypass", "notte"],
+    "artworkPath": "Cards/kael_lastwatch.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "AllEnemies",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 1.4 + MAG * 0.6 + 20",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_EDRIC_007",
+    "name": "Voce di Edric",
+    "description": "Reazione automatica: contrattacca se un alleato subisce danni gravi.",
+    "flavorText": "Edric era rimasto a coprirlo. Mentre Kael correva.",
+    "cardType": "Reazione",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 5,
+    "tags": ["reazione", "kael", "alleato", "greypass", "edric"],
+    "artworkPath": "Cards/kael_edric.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 1.2",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_WEIGHT_008",
+    "name": "Peso del Passato",
+    "description": "Passiva: aumenta il danno ma riduce la velocità. Il peso si porta sempre.",
+    "flavorText": "Non si trattava di stanchezza fisica.",
+    "cardType": "Passiva",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 4,
+    "tags": ["passiva", "kael", "danno", "velocità"],
+    "artworkPath": "Cards/kael_weight.png",
+    "statATK": 8,
+    "statSPD": -3,
+    "effects": []
+  },
+  {
+    "id": "CARD_KAEL_BLADE_009",
+    "name": "Lama Affilata",
+    "description": "Aumenta la probabilità di colpo critico per 2 turni. Ogni sera la lama veniva affilata.",
+    "flavorText": "La lama pulita era l'unico rituale che lo teneva ancorato a qualcosa di concreto.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["critico", "kael", "spada", "rituale"],
+    "artworkPath": "Cards/kael_blade.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "baseValue": 25,
+        "scalingFormula": "",
+        "statusEffect": "Potenziato",
+        "statusDuration": 2,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_CAPTAIN_010",
+    "name": "Capitano 7a Compagnia",
+    "description": "Dona SP a un alleato. Una volta sapeva prendersi cura dei suoi uomini.",
+    "flavorText": "Il numero 7, inciso sulla placca di ottone. Non ricordava quando aveva cominciato a portarla.",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 6,
+    "tags": ["supporto", "kael", "sp", "compagnia", "edric"],
+    "artworkPath": "Cards/kael_captain.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "SingleAlly",
+        "baseValue": 2,
+        "scalingFormula": "",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_JACKET_011",
+    "name": "Giacca Imperiale Scucita",
+    "description": "Armatura media. Riduce la durata dei debuff di 1 turno.",
+    "flavorText": "La giacca grigia e blu dell'esercito imperiale, con i galloni strappati via.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Armatura",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["armatura", "kael", "imperiale", "debuff"],
+    "artworkPath": "Cards/kael_jacket.png",
+    "statDEF": 12,
+    "statRES": 4,
+    "effects": []
+  },
+  {
+    "id": "CARD_KAEL_SWORD_012",
+    "name": "Spada del Capitano",
+    "description": "Arma principale con bonus ATK. Più efficace quando Kael è sotto pressione.",
+    "flavorText": "La lama lunga da cavaliere, con l'elsa in ferro scurito. Non arrugginita.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Arma",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["arma", "kael", "spada", "capitano"],
+    "artworkPath": "Cards/kael_sword.png",
+    "statATK": 18,
+    "effects": []
+  },
+  {
+    "id": "CARD_KAEL_GLOVE_013",
+    "name": "Guanto Sinistro",
+    "description": "Accessorio. Nasconde la cicatrice del giuramento. Resistenza agli stati psicologici.",
+    "flavorText": "Porta sempre il guanto sinistro, anche d'estate.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["accessorio", "kael", "giuramento", "edric", "psicologico"],
+    "artworkPath": "Cards/kael_glove.png",
+    "statRES": 8,
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "statusEffect": "Ancorato",
+        "statusDuration": 0,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_BRASS_014",
+    "name": "Placca di Ottone N.7",
+    "description": "Accessorio passivo. Rigenera SP ogni turno. Il numero della compagnia di Edric.",
+    "flavorText": "Il numero 7, inciso. Kael non ricorda di aver scelto di portarla.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Rara",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 7,
+    "tags": ["accessorio", "kael", "sp", "edric", "compagnia"],
+    "artworkPath": "Cards/kael_brass.png",
+    "statSP": 6,
+    "effects": []
+  },
+  {
+    "id": "CARD_KAEL_BOOT_015",
+    "name": "Stivali del Disertore",
+    "description": "Equipaggiamento ai piedi. Aumenta la velocità. Le gambe sanno ancora come scappare.",
+    "flavorText": "Si era alzato, aveva preso la spada, e si era mosso verso la porta d'uscita sul retro.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["accessorio", "kael", "velocità", "fuga"],
+    "artworkPath": "Cards/kael_boot.png",
+    "statSPD": 7,
+    "effects": []
+  },
+  {
+    "id": "CARD_KAEL_MEAD_016",
+    "name": "Idromele di Marshen",
+    "description": "Accessorio. Recupera HP a fine turno. Aspro e poco alcolico.",
+    "flavorText": "Economico. Il gesto di portare il boccale alle labbra era qualcosa che le mani sapevano fare senza che la testa dovesse partecipare.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["accessorio", "kael", "cura", "marshen"],
+    "artworkPath": "Cards/kael_mead.png",
+    "statDEF": 3,
+    "effects": []
+  },
+  {
+    "id": "CARD_KAEL_ANCHOR_017",
+    "name": "Rituale d'Ancoraggio",
+    "description": "Kael usa il ricordo caldo di Edric per resistere all'Oscurità. Rimuove stati psicologici dal gruppo.",
+    "flavorText": "Lo cercò nel modo frenetico di chi sa di avere poco tempo. E lo trovò — come trovare una moneta in una tasca che pensavi vuota da anni.",
+    "cardType": "Abilita",
+    "cardRarity": "Rara",
+    "elementType": "Luce",
+    "spCost": 3,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 10,
+    "tags": ["supporto", "kael", "luce", "ancoraggio", "edric", "psicologico"],
+    "artworkPath": "Cards/kael_anchor.png",
+    "effects": [
+      {
+        "effectType": "Stato",
+        "target": "AllAllies",
+        "statusEffect": "Ancorato",
+        "statusDuration": 3,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_GREYPASS_018",
+    "name": "Ombra di Greypass",
+    "description": "Il ricordo del campo di battaglia potenzia il prossimo attacco. Morale -5.",
+    "flavorText": "Non c'era stata malvagità. Non c'era stato piano. C'era stata paura.",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Ombra",
+    "spCost": 2,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 5,
+    "tags": ["buff", "kael", "greypass", "ombra", "morale"],
+    "artworkPath": "Cards/kael_greypass.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 0.5",
+        "statusEffect": "Potenziato",
+        "statusDuration": 1,
+        "statusIntensity": 1.6,
+        "statusChance": 1.0
+      },
+      {
+        "effectType": "Stato",
+        "target": "Self",
+        "statusEffect": "Depresso",
+        "statusDuration": 1,
+        "statusIntensity": 0.95,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_KAEL_SHIELD_019",
+    "name": "Scudo dell'ex Capitano",
+    "description": "Armatura aggiuntiva. Riduce il danno subito e protegge chi è vicino.",
+    "flavorText": "Aveva ancora il riflesso di mettere il proprio corpo tra il pericolo e chi stava proteggendo.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Armatura",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 6,
+    "tags": ["armatura", "kael", "protezione", "capitano"],
+    "artworkPath": "Cards/kael_shield.png",
+    "statDEF": 20,
+    "statRES": 6,
+    "effects": []
+  },
+  {
+    "id": "CARD_KAEL_TOMORROW_020",
+    "name": "A Domani",
+    "description": "Kael recupera HP e SP. Disponibile solo dopo il Santuario. Pensare al domani come a qualcosa di reale.",
+    "flavorText": "'Cosa pensi?' / 'A domani.' / 'È un inizio.'",
+    "cardType": "Abilita",
+    "cardRarity": "Epica",
+    "elementType": "Luce",
+    "spCost": 3,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 20,
+    "tags": ["cura", "kael", "luce", "speranza", "epilogo"],
+    "artworkPath": "Cards/kael_tomorrow.png",
+    "effects": [
+      {
+        "effectType": "Cura",
+        "target": "Self",
+        "baseValue": 0,
+        "scalingFormula": "HP * 0.35",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "baseValue": 3,
+        "scalingFormula": "",
+        "statusEffect": "Ispirato",
+        "statusDuration": 3,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  }
+]
