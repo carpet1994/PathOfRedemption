@@ -1,0 +1,542 @@
+[
+  {
+    "id": "CARD_VORAN_WORDS_001",
+    "name": "Parole Contate",
+    "description": "Attacco magico che colpisce tre bersagli casuali. Usa il numero minimo di energie.",
+    "flavorText": "Parla poco. Quando parla, usa il numero minimo di parole necessarie a dire quello che intende.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 0,
+    "tags": ["danno", "voran", "multi", "efficienza", "silenzio"],
+    "artworkPath": "Cards/voran_words.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "Random",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 0.9 + 15",
+        "hitCount": 3
+      }
+    ]
+  },
+  {
+    "id": "CARD_VORAN_RATION_002",
+    "name": "Razione di Voce",
+    "description": "Passiva: recupera 1 SP ogni 2 turni. Come se avesse calcolato la razione di voce che gli resta.",
+    "flavorText": "Come un uomo che ha calcolato la razione di voce che gli resta e intende sprecarla il meno possibile.",
+    "cardType": "Passiva",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 0,
+    "tags": ["passiva", "voran", "sp", "razione", "silenzio"],
+    "artworkPath": "Cards/voran_ration.png",
+    "statSP": 6,
+    "effects": []
+  },
+  {
+    "id": "CARD_VORAN_PIPE_003",
+    "name": "Pipa Non Fumata",
+    "description": "Passiva: cura lieve ogni turno. L'abitudine repressa diventa forza silenziosa.",
+    "flavorText": "Una pipa che porta sempre nella tasca del petto ma che non fuma mai, almeno non quando c'è qualcun altro.",
+    "cardType": "Passiva",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 0,
+    "tags": ["passiva", "voran", "cura", "pipa", "rigenerazione"],
+    "artworkPath": "Cards/voran_pipe.png",
+    "statDEF": 4,
+    "statRES": 6,
+    "effects": []
+  },
+  {
+    "id": "CARD_VORAN_QUESTIONS_004",
+    "name": "Domande Senza Risposta",
+    "description": "Riduce MAG nemica del 20% per 3 turni. Ha già smesso di cercare risposte.",
+    "flavorText": "Ha già smesso di cercare risposte e si è accontentato di stare con le domande.",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 2,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 4,
+    "tags": ["debuff", "voran", "mag", "domande", "silenzio"],
+    "artworkPath": "Cards/voran_questions.png",
+    "effects": [
+      {
+        "effectType": "Debuff",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 0.5",
+        "statusEffect": "Depresso",
+        "statusDuration": 3,
+        "statusIntensity": 0.8,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_VORAN_SANDALS_005",
+    "name": "Sandali Risuolati",
+    "description": "Aumenta la velocità dell'intero gruppo. Risuolati da solo, con spago nuovo.",
+    "flavorText": "Ai piedi porta sandali di cuoio tenuti insieme da spago nuovo — se li risuola da solo, non va in città.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 0,
+    "tags": ["buff", "voran", "velocità", "sandali", "autosufficienza"],
+    "artworkPath": "Cards/voran_sandals.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "AllAllies",
+        "baseValue": 0,
+        "scalingFormula": "SPD * 0.2 + 8",
+        "statusEffect": "Velocizzato",
+        "statusDuration": 2,
+        "statusIntensity": 1.2,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_VORAN_BURNEDSASH_006",
+    "name": "Fascia Bruciata",
+    "description": "Attacco Fuoco. Voran ha bruciato il suo rango — ma il potere resta.",
+    "flavorText": "Ha perso la fascia colorata che indicava il suo rango di mago imperiale anni fa. L'ha bruciata lui stesso.",
+    "cardType": "Abilita",
+    "cardRarity": "Rara",
+    "elementType": "Fuoco",
+    "spCost": 3,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 8,
+    "tags": ["danno", "voran", "fuoco", "rango", "imperiale"],
+    "artworkPath": "Cards/voran_burnedsash.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 2.4 + 35",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Stato",
+        "target": "SingleEnemy",
+        "statusEffect": "Avvelenato",
+        "statusDuration": 3,
+        "statusIntensity": 0.8,
+        "statusChance": 0.55
+      }
+    ]
+  },
+  {
+    "id": "CARD_VORAN_MONASTERY_007",
+    "name": "Decenni di Monastero",
+    "description": "Passiva: +30% resistenza a stati mentali. Cinquant'anni di silenzio come armatura.",
+    "flavorText": "Cinquant'anni di monastero. Non perché li meritasse, ma perché stava ancora cercando di pareggiare i conti.",
+    "cardType": "Passiva",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 5,
+    "tags": ["passiva", "voran", "resistenza", "mentale", "monastero"],
+    "artworkPath": "Cards/voran_monastery.png",
+    "statRES": 18,
+    "effects": []
+  },
+  {
+    "id": "CARD_VORAN_REDEMPTION_008",
+    "name": "Redenzione Propria",
+    "description": "Carta speciale del capitolo finale. Voran dona tutto il suo SP al gruppo prima di cadere.",
+    "flavorText": "'La mia redenzione.' / 'Millworth. I tre uomini. Cinquant'anni di monastero non erano abbastanza.' / 'Adesso i conti sono... altro.'",
+    "cardType": "Abilita",
+    "cardRarity": "Leggendaria",
+    "elementType": "Luce",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 25,
+    "tags": ["sacrificio", "voran", "sp", "redenzione", "finale", "luce"],
+    "artworkPath": "Cards/voran_redemption.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "AllAllies",
+        "baseValue": 6,
+        "scalingFormula": "",
+        "statusEffect": "Ispirato",
+        "statusDuration": 3,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_VORAN_SILENCE_009",
+    "name": "Il Silenzio come Risposta",
+    "description": "Reazione: nullifica completamente un incantesimo nemico.",
+    "flavorText": "'Vengo.' / 'Perché?' / 'Perché hai già la risposta.'",
+    "cardType": "Reazione",
+    "cardRarity": "Rara",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 12,
+    "tags": ["reazione", "voran", "nullifica", "silenzio", "magia"],
+    "artworkPath": "Cards/voran_silence.png",
+    "effects": [
+      {
+        "effectType": "Scudo",
+        "target": "Self",
+        "baseValue": 9999,
+        "scalingFormula": "",
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_VORAN_ROBE_010",
+    "name": "Veste Monacale Grigia",
+    "description": "Armatura leggera. Alta resistenza mentale, velocità ridotta. Il peso del silenzio.",
+    "flavorText": "Una veste monacale, grigia, con la cintura di corda.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Armatura",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 0,
+    "tags": ["armatura", "voran", "resistenza", "mentale", "monastero"],
+    "artworkPath": "Cards/voran_robe.png",
+    "statDEF": 6,
+    "statRES": 20,
+    "statSPD": -2,
+    "effects": []
+  },
+  {
+    "id": "CARD_VORAN_ROPE_011",
+    "name": "Cintura di Corda",
+    "description": "Accessorio: +1 SP per turno. Semplice, fatto a mano, sufficiente.",
+    "flavorText": "La cintura di corda. Tutto quello che rimane del monastero, portato addosso.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 0,
+    "tags": ["accessorio", "voran", "sp", "corda", "monastero"],
+    "artworkPath": "Cards/voran_rope.png",
+    "statSP": 10,
+    "effects": []
+  },
+  {
+    "id": "CARD_VORAN_PIPEACC_012",
+    "name": "La Pipa",
+    "description": "Accessorio passivo: ogni 5 turni applica Calma all'intero gruppo.",
+    "flavorText": "La porta sempre nella tasca del petto. Non la fuma mai quando c'è qualcun altro.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Rara",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 10,
+    "tags": ["accessorio", "voran", "calma", "pipa", "supporto"],
+    "artworkPath": "Cards/voran_pipeacc.png",
+    "statRES": 8,
+    "effects": []
+  },
+  {
+    "id": "CARD_VORAN_STAFF_013",
+    "name": "Bastone del Mago Silente",
+    "description": "Arma principale. Aumenta MAG e SP max. Non serve alzare la voce.",
+    "flavorText": "Non aveva mai avuto bisogno di gridare per farsi ascoltare.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Arma",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 0,
+    "tags": ["arma", "voran", "mag", "sp", "silenzio"],
+    "artworkPath": "Cards/voran_staff.png",
+    "statMAG": 20,
+    "statSP": 6,
+    "effects": []
+  },
+  {
+    "id": "CARD_VORAN_MILLWORTH_014",
+    "name": "Ombra di Millworth",
+    "description": "Attacco magico potenziato dalla colpa. Simile al peso di Kael, ma diverso nel sapore.",
+    "flavorText": "'Ho combattuto a Millworth. Ho perso tre uomini per un ordine sbagliato. Il mio.'",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Ombra",
+    "spCost": 2,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 6,
+    "tags": ["danno", "voran", "ombra", "millworth", "colpa"],
+    "artworkPath": "Cards/voran_millworth.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 2.0 + LVL * 4",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_VORAN_QUESTION_015",
+    "name": "La Domanda Giusta",
+    "description": "Stordisce un nemico per 1 turno. Non 'meriti di essere perdonato?' ma 'chi sei adesso?'",
+    "flavorText": "'La domanda giusta è un'altra. Quella che mi ha impiegato vent'anni a trovare.' / 'Quale?' / 'Chi sei adesso, con la colpa addosso?'",
+    "cardType": "Abilita",
+    "cardRarity": "Rara",
+    "elementType": "Neutro",
+    "spCost": 2,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 14,
+    "tags": ["controllo", "voran", "stordito", "domanda", "redenzione"],
+    "artworkPath": "Cards/voran_question.png",
+    "effects": [
+      {
+        "effectType": "Stato",
+        "target": "SingleEnemy",
+        "statusEffect": "Stordito",
+        "statusDuration": 1,
+        "statusIntensity": 1.0,
+        "statusChance": 0.80
+      }
+    ]
+  },
+  {
+    "id": "CARD_SERA_NOTCRYING_016",
+    "name": "Non Piango",
+    "description": "Passiva: Sera è immune a Paura e Terrore. Ha già capito che in questo momento piangere non serve.",
+    "flavorText": "Non piange. Non si lamenta. Non chiede. Non perché non senta — ma perché ha già capito che piangere non serve.",
+    "cardType": "Passiva",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 0,
+    "tags": ["passiva", "sera", "immunità", "paura", "forza"],
+    "artworkPath": "Cards/sera_notcrying.png",
+    "statRES": 12,
+    "effects": []
+  },
+  {
+    "id": "CARD_SERA_FARMGIRL_017",
+    "name": "Bambina di Campagna",
+    "description": "Attacco fisico base che sorprende i nemici. Mani piccole ma dure.",
+    "flavorText": "Le mani erano quelle di una bambina di campagna: piccole ma dure, con le unghie spezzate e le nocche callose.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 0,
+    "tags": ["fisico", "sera", "sorpresa", "campagna"],
+    "artworkPath": "Cards/sera_farmgirl.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 1.3 + SPD * 0.5 + 10",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_SERA_WAITING_018",
+    "name": "Aspetto che Tornino",
+    "description": "Accumula un bonus danno per 2 turni. Poi smette di aspettare.",
+    "flavorText": "Aveva aspettato che tornassero. Poi aveva smesso di aspettare anche quello.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 0,
+    "tags": ["buff", "sera", "attesa", "danno", "accumulo"],
+    "artworkPath": "Cards/sera_waiting.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 0.4 + 12",
+        "statusEffect": "Potenziato",
+        "statusDuration": 2,
+        "statusIntensity": 1.4,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_SERA_NEXTSTEP_019",
+    "name": "Il Passo Successivo",
+    "description": "Cura lieve all'intero gruppo. Sera decide sempre cosa fare dopo.",
+    "flavorText": "Nella fase in cui bisogna decidere il passo successivo.",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 2,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 3,
+    "tags": ["cura", "sera", "gruppo", "supporto", "passo"],
+    "artworkPath": "Cards/sera_nextstep.png",
+    "effects": [
+      {
+        "effectType": "Cura",
+        "target": "AllAllies",
+        "baseValue": 0,
+        "scalingFormula": "LVL * 4 + 15",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_SERA_THORNS_020",
+    "name": "Mani Abituate ai Rovi",
+    "description": "Attacco fisico che applica Sanguinamento al nemico.",
+    "flavorText": "Mani abituate al lavoro, alla terra, ai rovi della foresta.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Terra",
+    "spCost": 1,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 0,
+    "tags": ["fisico", "sera", "terra", "sanguinamento", "rovi"],
+    "artworkPath": "Cards/sera_thorns.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 1.1 + 8",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Stato",
+        "target": "SingleEnemy",
+        "statusEffect": "Avvelenato",
+        "statusDuration": 3,
+        "statusIntensity": 0.7,
+        "statusChance": 0.70
+      }
+    ]
+  },
+  {
+    "id": "CARD_SERA_REPORT_021",
+    "name": "Resoconto Essenziale",
+    "description": "Rimuove confusione e panico dall'intero gruppo. Sera descrive la situazione senza ornamenti.",
+    "flavorText": "Lo disse come chi sta facendo il resoconto di una situazione — con la precisione essenziale di chi ha già speso tutte le lacrime.",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 4,
+    "tags": ["cleanse", "sera", "supporto", "resoconto", "panico"],
+    "artworkPath": "Cards/sera_report.png",
+    "effects": [
+      {
+        "effectType": "Stato",
+        "target": "AllAllies",
+        "statusEffect": "Ancorato",
+        "statusDuration": 2,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_SERA_BIGDRESS_022",
+    "name": "Vestito Troppo Grande",
+    "description": "Armatura bassa ma alta evasione. Sera è piccola — sfugge ai colpi.",
+    "flavorText": "Un vestito troppo grande, trovato chissà dove, forse abbandonato in una delle case del villaggio svuotato.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Armatura",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 0,
+    "tags": ["armatura", "sera", "evasione", "vestito", "piccola"],
+    "artworkPath": "Cards/sera_bigdress.png",
+    "statDEF": 4,
+    "statSPD": 12,
+    "effects": []
+  },
+  {
+    "id": "CARD_SERA_HANDS_023",
+    "name": "Mani di Campagna",
+    "description": "Guanti da lavoro. Aumentano leggermente l'ATK fisico.",
+    "flavorText": "Mani abituate al lavoro. Non delicate. Utili.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Arma",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 0,
+    "tags": ["arma", "sera", "fisico", "mani", "campagna"],
+    "artworkPath": "Cards/sera_hands.png",
+    "statATK": 10,
+    "effects": []
+  },
+  {
+    "id": "CARD_SERA_TRUST_024",
+    "name": "Fiducia Assoluta",
+    "description": "Reazione: quando Kael è a rischio KO, Sera interviene con una cura d'emergenza.",
+    "flavorText": "Si sdraiò vicino a lui e si addormentò in meno di cinque minuti, con la fiducia assoluta e un po' incredibile dei bambini che hanno deciso di fidarsi.",
+    "cardType": "Reazione",
+    "cardRarity": "Rara",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 7,
+    "tags": ["reazione", "sera", "kael", "cura", "fiducia"],
+    "artworkPath": "Cards/sera_trust.png",
+    "effects": [
+      {
+        "effectType": "Cura",
+        "target": "SingleAlly",
+        "baseValue": 0,
+        "scalingFormula": "HP * 0.20 + LVL * 3",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_SERA_HOLLOW_025",
+    "name": "Il Cavo del Faggio",
+    "description": "Accessorio. Aumenta la sopravvivenza: una volta per battaglia, sopravvive con 1 HP.",
+    "flavorText": "Nel cavo che si apriva alla base del tronco — un faggio enorme, probabilmente più vecchio del villaggio stesso.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 5,
+    "tags": ["accessorio", "sera", "sopravvivenza", "faggio", "verdholm"],
+    "artworkPath": "Cards/sera_hollow.png",
+    "statHP": 15,
+    "effects": []
+  }
+]
