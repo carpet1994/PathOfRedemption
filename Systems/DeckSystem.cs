@@ -137,6 +137,7 @@ namespace LaViaDellaRedenzione.Systems
                 stats.RES += card.StatRES;
                 stats.SPD += card.StatSPD;
                 stats.SP  += card.StatSP;
+                stats.HP  += card.StatHP;
             }
             return stats;
         }
@@ -170,6 +171,7 @@ namespace LaViaDellaRedenzione.Systems
         public int RES { get; set; }
         public int SPD { get; set; }
         public int SP  { get; set; }
+        public int HP  { get; set; }
     }
 
     // =========================================================================
