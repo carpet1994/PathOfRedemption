@@ -1,0 +1,459 @@
+﻿[
+    {
+        "id":  "CARD_VORAN_WORDS_001",
+        "name":  "Parole Contate",
+        "description":  "Attacco magico che colpisce tre bersagli casuali. Usa il numero minimo di energie.",
+        "flavorText":  "Parla poco. Quando parla, usa il numero minimo di parole necessarie a dire quello che intende.",
+        "cardType":  "Abilita",
+        "cardRarity":  "Comune",
+        "elementType":  "Neutro",
+        "spCost":  1,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "danno",
+                     "voran",
+                     "multi",
+                     "efficienza",
+                     "silenzio"
+                 ],
+        "artworkPath":  "Cards/voran_words.png",
+        "effects":  [
+                        {
+                            "effectType":  "Danno",
+                            "target":  "Random",
+                            "baseValue":  0,
+                            "scalingFormula":  "MAG * 0.9 + 15",
+                            "hitCount":  3
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_RATION_002",
+        "name":  "Razione di Voce",
+        "description":  "Passiva: recupera 1 SP ogni 2 turni. Come se avesse calcolato la razione di voce che gli resta.",
+        "flavorText":  "Come un uomo che ha calcolato la razione di voce che gli resta e intende sprecarla il meno possibile.",
+        "cardType":  "Passiva",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "passiva",
+                     "voran",
+                     "sp",
+                     "razione",
+                     "silenzio"
+                 ],
+        "artworkPath":  "Cards/voran_ration.png",
+        "statSP":  6,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_PIPE_003",
+        "name":  "Pipa Non Fumata",
+        "description":  "Passiva: cura lieve ogni turno. L\u0027abitudine repressa diventa forza silenziosa.",
+        "flavorText":  "Una pipa che porta sempre nella tasca del petto ma che non fuma mai, almeno non quando c\u0027Ã¨ qualcun altro.",
+        "cardType":  "Passiva",
+        "cardRarity":  "Comune",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "passiva",
+                     "voran",
+                     "cura",
+                     "pipa",
+                     "rigenerazione"
+                 ],
+        "artworkPath":  "Cards/voran_pipe.png",
+        "statDEF":  4,
+        "statRES":  6,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_QUESTIONS_004",
+        "name":  "Domande Senza Risposta",
+        "description":  "Riduce MAG nemica del 20% per 3 turni. Ha giÃ  smesso di cercare risposte.",
+        "flavorText":  "Ha giÃ  smesso di cercare risposte e si Ã¨ accontentato di stare con le domande.",
+        "cardType":  "Abilita",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  2,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  4,
+        "tags":  [
+                     "debuff",
+                     "voran",
+                     "mag",
+                     "domande",
+                     "silenzio"
+                 ],
+        "artworkPath":  "Cards/voran_questions.png",
+        "effects":  [
+                        {
+                            "effectType":  "Debuff",
+                            "target":  "SingleEnemy",
+                            "baseValue":  0,
+                            "scalingFormula":  "MAG * 0.5",
+                            "statusEffect":  "Depresso",
+                            "statusDuration":  3,
+                            "statusIntensity":  0.8,
+                            "statusChance":  1.0
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_SANDALS_005",
+        "name":  "Sandali Risuolati",
+        "description":  "Aumenta la velocitÃ  dell\u0027intero gruppo. Risuolati da solo, con spago nuovo.",
+        "flavorText":  "Ai piedi porta sandali di cuoio tenuti insieme da spago nuovo â€” se li risuola da solo, non va in cittÃ .",
+        "cardType":  "Abilita",
+        "cardRarity":  "Comune",
+        "elementType":  "Neutro",
+        "spCost":  1,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "buff",
+                     "voran",
+                     "velocitÃ ",
+                     "sandali",
+                     "autosufficienza"
+                 ],
+        "artworkPath":  "Cards/voran_sandals.png",
+        "effects":  [
+                        {
+                            "effectType":  "Buff",
+                            "target":  "AllAllies",
+                            "baseValue":  0,
+                            "scalingFormula":  "SPD * 0.2 + 8",
+                            "statusEffect":  "Velocizzato",
+                            "statusDuration":  2,
+                            "statusIntensity":  1.2,
+                            "statusChance":  1.0
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_BURNEDSASH_006",
+        "name":  "Fascia Bruciata",
+        "description":  "Attacco Fuoco. Voran ha bruciato il suo rango â€” ma il potere resta.",
+        "flavorText":  "Ha perso la fascia colorata che indicava il suo rango di mago imperiale anni fa. L\u0027ha bruciata lui stesso.",
+        "cardType":  "Abilita",
+        "cardRarity":  "Rara",
+        "elementType":  "Fuoco",
+        "spCost":  3,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  8,
+        "tags":  [
+                     "danno",
+                     "voran",
+                     "fuoco",
+                     "rango",
+                     "imperiale"
+                 ],
+        "artworkPath":  "Cards/voran_burnedsash.png",
+        "effects":  [
+                        {
+                            "effectType":  "Danno",
+                            "target":  "SingleEnemy",
+                            "baseValue":  0,
+                            "scalingFormula":  "MAG * 2.4 + 35",
+                            "hitCount":  1
+                        },
+                        {
+                            "effectType":  "Stato",
+                            "target":  "SingleEnemy",
+                            "statusEffect":  "Avvelenato",
+                            "statusDuration":  3,
+                            "statusIntensity":  0.8,
+                            "statusChance":  0.55
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_MONASTERY_007",
+        "name":  "Decenni di Monastero",
+        "description":  "Passiva: +30% resistenza a stati mentali. Cinquant\u0027anni di silenzio come armatura.",
+        "flavorText":  "Cinquant\u0027anni di monastero. Non perchÃ© li meritasse, ma perchÃ© stava ancora cercando di pareggiare i conti.",
+        "cardType":  "Passiva",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  5,
+        "tags":  [
+                     "passiva",
+                     "voran",
+                     "resistenza",
+                     "mentale",
+                     "monastero"
+                 ],
+        "artworkPath":  "Cards/voran_monastery.png",
+        "statRES":  18,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_REDEMPTION_008",
+        "name":  "Redenzione Propria",
+        "description":  "Carta speciale del capitolo finale. Voran dona tutto il suo SP al gruppo prima di cadere.",
+        "flavorText":  "\u0027La mia redenzione.\u0027 / \u0027Millworth. I tre uomini. Cinquant\u0027anni di monastero non erano abbastanza.\u0027 / \u0027Adesso i conti sono... altro.\u0027",
+        "cardType":  "Abilita",
+        "cardRarity":  "Leggendaria",
+        "elementType":  "Luce",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  25,
+        "tags":  [
+                     "sacrificio",
+                     "voran",
+                     "sp",
+                     "redenzione",
+                     "finale",
+                     "luce"
+                 ],
+        "artworkPath":  "Cards/voran_redemption.png",
+        "effects":  [
+                        {
+                            "effectType":  "Buff",
+                            "target":  "AllAllies",
+                            "baseValue":  6,
+                            "scalingFormula":  "",
+                            "statusEffect":  "Ispirato",
+                            "statusDuration":  3,
+                            "statusIntensity":  1.0,
+                            "statusChance":  1.0
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_SILENCE_009",
+        "name":  "Il Silenzio come Risposta",
+        "description":  "Reazione: nullifica completamente un incantesimo nemico.",
+        "flavorText":  "\u0027Vengo.\u0027 / \u0027PerchÃ©?\u0027 / \u0027PerchÃ© hai giÃ  la risposta.\u0027",
+        "cardType":  "Reazione",
+        "cardRarity":  "Rara",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  12,
+        "tags":  [
+                     "reazione",
+                     "voran",
+                     "nullifica",
+                     "silenzio",
+                     "magia"
+                 ],
+        "artworkPath":  "Cards/voran_silence.png",
+        "effects":  [
+                        {
+                            "effectType":  "Scudo",
+                            "target":  "Self",
+                            "baseValue":  9999,
+                            "scalingFormula":  "",
+                            "statusChance":  1.0
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_ROBE_010",
+        "name":  "Veste Monacale Grigia",
+        "description":  "Armatura leggera. Alta resistenza mentale, velocitÃ  ridotta. Il peso del silenzio.",
+        "flavorText":  "Una veste monacale, grigia, con la cintura di corda.",
+        "cardType":  "Equipaggiamento",
+        "equipmentSubType":  "Armatura",
+        "cardRarity":  "Comune",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "armatura",
+                     "voran",
+                     "resistenza",
+                     "mentale",
+                     "monastero"
+                 ],
+        "artworkPath":  "Cards/voran_robe.png",
+        "statDEF":  6,
+        "statRES":  20,
+        "statSPD":  -2,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_ROPE_011",
+        "name":  "Cintura di Corda",
+        "description":  "Accessorio: +1 SP per turno. Semplice, fatto a mano, sufficiente.",
+        "flavorText":  "La cintura di corda. Tutto quello che rimane del monastero, portato addosso.",
+        "cardType":  "Equipaggiamento",
+        "equipmentSubType":  "Accessorio",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "accessorio",
+                     "voran",
+                     "sp",
+                     "corda",
+                     "monastero"
+                 ],
+        "artworkPath":  "Cards/voran_rope.png",
+        "statSP":  10,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_PIPEACC_012",
+        "name":  "La Pipa",
+        "description":  "Accessorio passivo: ogni 5 turni applica Calma all\u0027intero gruppo.",
+        "flavorText":  "La porta sempre nella tasca del petto. Non la fuma mai quando c\u0027Ã¨ qualcun altro.",
+        "cardType":  "Equipaggiamento",
+        "equipmentSubType":  "Accessorio",
+        "cardRarity":  "Rara",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  10,
+        "tags":  [
+                     "accessorio",
+                     "voran",
+                     "calma",
+                     "pipa",
+                     "supporto"
+                 ],
+        "artworkPath":  "Cards/voran_pipeacc.png",
+        "statRES":  8,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_STAFF_013",
+        "name":  "Bastone del Mago Silente",
+        "description":  "Arma principale. Aumenta MAG e SP max. Non serve alzare la voce.",
+        "flavorText":  "Non aveva mai avuto bisogno di gridare per farsi ascoltare.",
+        "cardType":  "Equipaggiamento",
+        "equipmentSubType":  "Arma",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "arma",
+                     "voran",
+                     "mag",
+                     "sp",
+                     "silenzio"
+                 ],
+        "artworkPath":  "Cards/voran_staff.png",
+        "statMAG":  20,
+        "statSP":  6,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_MILLWORTH_014",
+        "name":  "Ombra di Millworth",
+        "description":  "Attacco magico potenziato dalla colpa. Simile al peso di Kael, ma diverso nel sapore.",
+        "flavorText":  "\u0027Ho combattuto a Millworth. Ho perso tre uomini per un ordine sbagliato. Il mio.\u0027",
+        "cardType":  "Abilita",
+        "cardRarity":  "Insolita",
+        "elementType":  "Ombra",
+        "spCost":  2,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  6,
+        "tags":  [
+                     "danno",
+                     "voran",
+                     "ombra",
+                     "millworth",
+                     "colpa"
+                 ],
+        "artworkPath":  "Cards/voran_millworth.png",
+        "effects":  [
+                        {
+                            "effectType":  "Danno",
+                            "target":  "SingleEnemy",
+                            "baseValue":  0,
+                            "scalingFormula":  "MAG * 2.0 + LVL * 4",
+                            "hitCount":  1
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_VORAN_QUESTION_015",
+        "name":  "La Domanda Giusta",
+        "description":  "Stordisce un nemico per 1 turno. Non \u0027meriti di essere perdonato?\u0027 ma \u0027chi sei adesso?\u0027",
+        "flavorText":  "\u0027La domanda giusta Ã¨ un\u0027altra. Quella che mi ha impiegato vent\u0027anni a trovare.\u0027 / \u0027Quale?\u0027 / \u0027Chi sei adesso, con la colpa addosso?\u0027",
+        "cardType":  "Abilita",
+        "cardRarity":  "Rara",
+        "elementType":  "Neutro",
+        "spCost":  2,
+        "allowedClasses":  [
+                               "Mago"
+                           ],
+        "unlockLevel":  14,
+        "tags":  [
+                     "controllo",
+                     "voran",
+                     "stordito",
+                     "domanda",
+                     "redenzione"
+                 ],
+        "artworkPath":  "Cards/voran_question.png",
+        "effects":  [
+                        {
+                            "effectType":  "Stato",
+                            "target":  "SingleEnemy",
+                            "statusEffect":  "Stordito",
+                            "statusDuration":  1,
+                            "statusIntensity":  1.0,
+                            "statusChance":  0.80
+                        }
+                    ]
+    }
+]

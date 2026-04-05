@@ -1,0 +1,307 @@
+﻿[
+    {
+        "id":  "CARD_SERA_NOTCRYING_016",
+        "name":  "Non Piango",
+        "description":  "Passiva: Sera Ã¨ immune a Paura e Terrore. Ha giÃ  capito che in questo momento piangere non serve.",
+        "flavorText":  "Non piange. Non si lamenta. Non chiede. Non perchÃ© non senta â€” ma perchÃ© ha giÃ  capito che piangere non serve.",
+        "cardType":  "Passiva",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "passiva",
+                     "sera",
+                     "immunitÃ ",
+                     "paura",
+                     "forza"
+                 ],
+        "artworkPath":  "Cards/sera_notcrying.png",
+        "statRES":  12,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_FARMGIRL_017",
+        "name":  "Bambina di Campagna",
+        "description":  "Attacco fisico base che sorprende i nemici. Mani piccole ma dure.",
+        "flavorText":  "Le mani erano quelle di una bambina di campagna: piccole ma dure, con le unghie spezzate e le nocche callose.",
+        "cardType":  "Abilita",
+        "cardRarity":  "Comune",
+        "elementType":  "Neutro",
+        "spCost":  1,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "fisico",
+                     "sera",
+                     "sorpresa",
+                     "campagna"
+                 ],
+        "artworkPath":  "Cards/sera_farmgirl.png",
+        "effects":  [
+                        {
+                            "effectType":  "Danno",
+                            "target":  "SingleEnemy",
+                            "baseValue":  0,
+                            "scalingFormula":  "ATK * 1.3 + SPD * 0.5 + 10",
+                            "hitCount":  1
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_WAITING_018",
+        "name":  "Aspetto che Tornino",
+        "description":  "Accumula un bonus danno per 2 turni. Poi smette di aspettare.",
+        "flavorText":  "Aveva aspettato che tornassero. Poi aveva smesso di aspettare anche quello.",
+        "cardType":  "Abilita",
+        "cardRarity":  "Comune",
+        "elementType":  "Neutro",
+        "spCost":  1,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "buff",
+                     "sera",
+                     "attesa",
+                     "danno",
+                     "accumulo"
+                 ],
+        "artworkPath":  "Cards/sera_waiting.png",
+        "effects":  [
+                        {
+                            "effectType":  "Buff",
+                            "target":  "Self",
+                            "baseValue":  0,
+                            "scalingFormula":  "ATK * 0.4 + 12",
+                            "statusEffect":  "Potenziato",
+                            "statusDuration":  2,
+                            "statusIntensity":  1.4,
+                            "statusChance":  1.0
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_NEXTSTEP_019",
+        "name":  "Il Passo Successivo",
+        "description":  "Cura lieve all\u0027intero gruppo. Sera decide sempre cosa fare dopo.",
+        "flavorText":  "Nella fase in cui bisogna decidere il passo successivo.",
+        "cardType":  "Abilita",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  2,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  3,
+        "tags":  [
+                     "cura",
+                     "sera",
+                     "gruppo",
+                     "supporto",
+                     "passo"
+                 ],
+        "artworkPath":  "Cards/sera_nextstep.png",
+        "effects":  [
+                        {
+                            "effectType":  "Cura",
+                            "target":  "AllAllies",
+                            "baseValue":  0,
+                            "scalingFormula":  "LVL * 4 + 15",
+                            "hitCount":  1
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_THORNS_020",
+        "name":  "Mani Abituate ai Rovi",
+        "description":  "Attacco fisico che applica Sanguinamento al nemico.",
+        "flavorText":  "Mani abituate al lavoro, alla terra, ai rovi della foresta.",
+        "cardType":  "Abilita",
+        "cardRarity":  "Comune",
+        "elementType":  "Terra",
+        "spCost":  1,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "fisico",
+                     "sera",
+                     "terra",
+                     "sanguinamento",
+                     "rovi"
+                 ],
+        "artworkPath":  "Cards/sera_thorns.png",
+        "effects":  [
+                        {
+                            "effectType":  "Danno",
+                            "target":  "SingleEnemy",
+                            "baseValue":  0,
+                            "scalingFormula":  "ATK * 1.1 + 8",
+                            "hitCount":  1
+                        },
+                        {
+                            "effectType":  "Stato",
+                            "target":  "SingleEnemy",
+                            "statusEffect":  "Avvelenato",
+                            "statusDuration":  3,
+                            "statusIntensity":  0.7,
+                            "statusChance":  0.70
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_REPORT_021",
+        "name":  "Resoconto Essenziale",
+        "description":  "Rimuove confusione e panico dall\u0027intero gruppo. Sera descrive la situazione senza ornamenti.",
+        "flavorText":  "Lo disse come chi sta facendo il resoconto di una situazione â€” con la precisione essenziale di chi ha giÃ  speso tutte le lacrime.",
+        "cardType":  "Abilita",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  1,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  4,
+        "tags":  [
+                     "cleanse",
+                     "sera",
+                     "supporto",
+                     "resoconto",
+                     "panico"
+                 ],
+        "artworkPath":  "Cards/sera_report.png",
+        "effects":  [
+                        {
+                            "effectType":  "Stato",
+                            "target":  "AllAllies",
+                            "statusEffect":  "Ancorato",
+                            "statusDuration":  2,
+                            "statusIntensity":  1.0,
+                            "statusChance":  1.0
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_BIGDRESS_022",
+        "name":  "Vestito Troppo Grande",
+        "description":  "Armatura bassa ma alta evasione. Sera Ã¨ piccola â€” sfugge ai colpi.",
+        "flavorText":  "Un vestito troppo grande, trovato chissÃ  dove, forse abbandonato in una delle case del villaggio svuotato.",
+        "cardType":  "Equipaggiamento",
+        "equipmentSubType":  "Armatura",
+        "cardRarity":  "Comune",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "armatura",
+                     "sera",
+                     "evasione",
+                     "vestito",
+                     "piccola"
+                 ],
+        "artworkPath":  "Cards/sera_bigdress.png",
+        "statDEF":  4,
+        "statSPD":  12,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_HANDS_023",
+        "name":  "Mani di Campagna",
+        "description":  "Guanti da lavoro. Aumentano leggermente l\u0027ATK fisico.",
+        "flavorText":  "Mani abituate al lavoro. Non delicate. Utili.",
+        "cardType":  "Equipaggiamento",
+        "equipmentSubType":  "Arma",
+        "cardRarity":  "Comune",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  0,
+        "tags":  [
+                     "arma",
+                     "sera",
+                     "fisico",
+                     "mani",
+                     "campagna"
+                 ],
+        "artworkPath":  "Cards/sera_hands.png",
+        "statATK":  10,
+        "effects":  [
+
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_TRUST_024",
+        "name":  "Fiducia Assoluta",
+        "description":  "Reazione: quando Kael Ã¨ a rischio KO, Sera interviene con una cura d\u0027emergenza.",
+        "flavorText":  "Si sdraiÃ² vicino a lui e si addormentÃ² in meno di cinque minuti, con la fiducia assoluta e un po\u0027 incredibile dei bambini che hanno deciso di fidarsi.",
+        "cardType":  "Reazione",
+        "cardRarity":  "Rara",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  7,
+        "tags":  [
+                     "reazione",
+                     "sera",
+                     "kael",
+                     "cura",
+                     "fiducia"
+                 ],
+        "artworkPath":  "Cards/sera_trust.png",
+        "effects":  [
+                        {
+                            "effectType":  "Cura",
+                            "target":  "SingleAlly",
+                            "baseValue":  0,
+                            "scalingFormula":  "HP * 0.20 + LVL * 3",
+                            "hitCount":  1
+                        }
+                    ]
+    },
+    {
+        "id":  "CARD_SERA_HOLLOW_025",
+        "name":  "Il Cavo del Faggio",
+        "description":  "Accessorio. Aumenta la sopravvivenza: una volta per battaglia, sopravvive con 1 HP.",
+        "flavorText":  "Nel cavo che si apriva alla base del tronco â€” un faggio enorme, probabilmente piÃ¹ vecchio del villaggio stesso.",
+        "cardType":  "Equipaggiamento",
+        "equipmentSubType":  "Accessorio",
+        "cardRarity":  "Insolita",
+        "elementType":  "Neutro",
+        "spCost":  0,
+        "allowedClasses":  [
+                               "Esploratore"
+                           ],
+        "unlockLevel":  5,
+        "tags":  [
+                     "accessorio",
+                     "sera",
+                     "sopravvivenza",
+                     "faggio",
+                     "verdholm"
+                 ],
+        "artworkPath":  "Cards/sera_hollow.png",
+        "statHP":  15,
+        "effects":  [
+
+                    ]
+    }
+]

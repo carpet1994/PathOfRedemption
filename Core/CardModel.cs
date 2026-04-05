@@ -318,6 +318,10 @@ namespace LaViaDellaRedenzione.Core
         [JsonProperty("statSP")]
         public int StatSP  { get; set; } = 0;
 
+        /// <summary>Bonus HP massimi (alcune carte equipaggiamento, es. Sera).</summary>
+        [JsonProperty("statHP")]
+        public int StatHP { get; set; } = 0;
+
         // ------------------------------------------------------------------
         //  Fusione
         // ------------------------------------------------------------------
@@ -567,6 +571,12 @@ namespace LaViaDellaRedenzione.Core
                 .Where(c => c.IsUnlockedAt(level))
                 .ToList();
         }
+
+        /// <summary>
+        /// Carte sbloccate per il personaggio al suo livello attuale (PROMPT 39).
+        /// </summary>
+        public IReadOnlyList<CardModel> GetUnlockedCards(Character character)
+            => GetCardsForCharacter(character.Class, character.Level);
 
         /// <summary>
         /// Restituisce tutte le carte con un tipo specifico.
