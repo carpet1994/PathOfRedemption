@@ -2,21 +2,21 @@
 //  La Via della Redenzione — Core/CardModel.cs
 //  Package : com.refa.valdrath
 //
-//  Descrizione : Modello dati completo del sistema di carte. Ogni carta
-//                è il cuore del gameplay — sostituisce equipaggiamento
-//                tradizionale e abilità dei JRPG classici.
+//  Descrizione : Modello dati puro del sistema di carte.
+//                Nessuna dipendenza da UI, piattaforma o MAUI.
+//
+//  CORREZIONE BUG 2:
+//    CardDatabase è stato spostato in Systems/CardDatabase.cs.
+//    Questo file ora contiene solo CardEffect, StatContext,
+//    FormulaEvaluator e CardModel — tutti tipi puramente dati,
+//    senza dipendenze da FileSystem o altri sistemi MAUI.
+//    Il `using LaViaDellaRedenzione.Systems` è stato rimosso.
 //
 //  Struttura:
-//    CardEffect   → singolo effetto applicato da una carta
-//    CardModel    → carta completa con tutti i suoi dati
-//    CardDatabase → singleton che carica e indicizza tutte le carte dai JSON
-//
-//  File JSON caricati all'avvio:
-//    /Assets/Data/cards_kael.json
-//    /Assets/Data/cards_lyra.json
-//    /Assets/Data/cards_voran.json
-//    /Assets/Data/cards_sera.json
-//    /Assets/Data/cards_legendary.json
+//    CardEffect       → singolo effetto applicato da una carta
+//    StatContext      → contesto statistiche per valutazione formula
+//    FormulaEvaluator → valutatore espressioni semplice (no reflection)
+//    CardModel        → carta completa con tutti i suoi dati
 //
 //  Formula scaling effetti:
 //    Stringa valutabile come espressione matematica semplice.
@@ -27,13 +27,10 @@
 //            "HP * 0.3"        →  cura proporzionale agli HP max
 // =============================================================================
 
-using LaViaDellaRedenzione.Systems;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace LaViaDellaRedenzione.Core
 {
@@ -146,8 +143,6 @@ namespace LaViaDellaRedenzione.Core
 
         /// <summary>
         /// Costruisce un StatContext da valori numerici espliciti.
-        /// Usato da BattleSystem prima che Character.cs sia disponibile,
-        /// e come API stabile a lungo termine.
         /// </summary>
         public static StatContext FromValues(
             float atk, float mag, float def, float res,
@@ -164,10 +159,8 @@ namespace LaViaDellaRedenzione.Core
             LVL = lvl
         };
 
-        // NOTA: FromCharacter(Character character) è definito in Character.cs
-        // come metodo di estensione su StatContext, per evitare dipendenze
-        // circolari tra Core/CardModel.cs e Core/Character.cs.
-        // Uso: StatContext.FromCharacter(myCharacter) → vedi Character.cs
+        // NOTA: StatContextExtensions.FromCharacter(Character character) è
+        // definito in Character.cs per evitare dipendenze circolari.
     }
 
     // =========================================================================
@@ -183,7 +176,6 @@ namespace LaViaDellaRedenzione.Core
     {
         public static float Evaluate(string formula, StatContext ctx)
         {
-            // Sostituisce le variabili con i valori numerici
             string expr = formula
                 .Replace("ATK", ctx.ATK.ToString("F2", System.Globalization.CultureInfo.InvariantCulture))
                 .Replace("MAG", ctx.MAG.ToString("F2", System.Globalization.CultureInfo.InvariantCulture))
@@ -195,7 +187,6 @@ namespace LaViaDellaRedenzione.Core
                 .Replace("SP",  ctx.SP.ToString("F2",  System.Globalization.CultureInfo.InvariantCulture))
                 .Replace("LVL", ctx.LVL.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
 
-            // Usa DataTable per valutare l'espressione numerica risultante
             var table  = new System.Data.DataTable();
             var result = table.Compute(expr, null);
             return Convert.ToSingle(result);
@@ -311,7 +302,6 @@ namespace LaViaDellaRedenzione.Core
         //  Statistiche equipaggiamento (per carte Equipaggiamento)
         // ------------------------------------------------------------------
 
-        /// <summary>Bonus ATK conferito dall'equipaggiamento. 0 se non applicabile.</summary>
         [JsonProperty("statATK")]
         public int StatATK { get; set; } = 0;
 
@@ -330,10 +320,6 @@ namespace LaViaDellaRedenzione.Core
         [JsonProperty("statSP")]
         public int StatSP  { get; set; } = 0;
 
-        /// <summary>
-        /// Bonus HP massimi conferiti dall'equipaggiamento.
-        /// Usato da CARD_SERA_HOLLOW_025 ("Il Cavo del Faggio") e carte simili.
-        /// </summary>
         [JsonProperty("statHP")]
         public int StatHP  { get; set; } = 0;
 
@@ -374,236 +360,5 @@ namespace LaViaDellaRedenzione.Core
 
         public override string ToString()
             => $"[{CardRarity}] {Name} ({CardType}, {ElementType}, {SpCost}SP)";
-    }
-
-    // =========================================================================
-    //  CARD DATABASE — singleton, carica e indicizza tutte le carte
-    // =========================================================================
-
-    /// <summary>
-    /// Singleton che carica tutte le carte dai file JSON all'avvio
-    /// e le rende accessibili per ID, tag, rarità e personaggio.
-    ///
-    /// INIZIALIZZAZIONE:
-    ///   await CardDatabase.Instance.LoadAllAsync();
-    ///   // Da questo momento tutte le query sono sincrone e veloci.
-    ///
-    /// QUERY TIPICHE:
-    ///   var card  = CardDatabase.Instance.GetById("CARD_KAEL_SLASH_001");
-    ///   var cards = CardDatabase.Instance.GetCardsByTag("luce");
-    ///   var deck  = CardDatabase.Instance.GetCardsForCharacter(CharacterClass.Guerriero, level: 5);
-    /// </summary>
-    public sealed class CardDatabase
-    {
-        // ------------------------------------------------------------------
-        //  Singleton
-        // ------------------------------------------------------------------
-
-        private static CardDatabase? _instance;
-        public static CardDatabase Instance => _instance ??= new CardDatabase();
-        private CardDatabase() { }
-
-        // ------------------------------------------------------------------
-        //  Storage interno
-        // ------------------------------------------------------------------
-
-        /// <summary>Tutte le carte indicizzate per ID.</summary>
-        private readonly Dictionary<string, CardModel> _byId = new();
-
-        /// <summary>Carte indicizzate per tag (ogni carta può avere più tag).</summary>
-        private readonly Dictionary<string, List<CardModel>> _byTag
-            = new(StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>Carte indicizzate per rarità.</summary>
-        private readonly Dictionary<CardRarity, List<CardModel>> _byRarity = new();
-
-        /// <summary>Carte indicizzate per CharacterClass.</summary>
-        private readonly Dictionary<CharacterClass, List<CardModel>> _byClass = new();
-
-        public bool IsLoaded { get; private set; } = false;
-
-        // ------------------------------------------------------------------
-        //  FILE JSON DA CARICARE
-        // ------------------------------------------------------------------
-
-        private static readonly string[] CardFiles = new[]
-        {
-            "Data/cards_kael.json",
-            "Data/cards_lyra.json",
-            "Data/cards_voran.json",
-            "Data/cards_sera.json",
-            "Data/cards_legendary.json"
-        };
-
-        // ------------------------------------------------------------------
-        //  CARICAMENTO
-        // ------------------------------------------------------------------
-
-        /// <summary>
-        /// Carica tutti i file JSON e costruisce gli indici.
-        /// Da chiamare una sola volta all'avvio, prima del menu principale.
-        /// </summary>
-        public async Task LoadAllAsync()
-        {
-            if (IsLoaded) return;
-
-            _byId.Clear();
-            _byTag.Clear();
-            _byRarity.Clear();
-            _byClass.Clear();
-
-            foreach (var filePath in CardFiles)
-            {
-                await LoadFileAsync(filePath);
-            }
-
-            IsLoaded = true;
-
-            System.Diagnostics.Debug.WriteLine(
-                $"[CardDatabase] Caricate {_byId.Count} carte da {CardFiles.Length} file.");
-        }
-
-        private async Task LoadFileAsync(string relativePath)
-        {
-            try
-            {
-                using var stream = await FileSystem.OpenAppPackageFileAsync(relativePath);
-                if (stream == null)
-                {
-                    System.Diagnostics.Debug.WriteLine(
-                        $"[CardDatabase] File non trovato: {relativePath}");
-                    return;
-                }
-
-                using var reader = new StreamReader(stream);
-                string json      = await reader.ReadToEndAsync();
-
-                var cards = JsonConvert.DeserializeObject<List<CardModel>>(json);
-                if (cards == null) return;
-
-                foreach (var card in cards)
-                    Register(card);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(
-                    $"[CardDatabase] Errore caricamento {relativePath}: {ex.Message}");
-            }
-        }
-
-        /// <summary>Registra una carta in tutti gli indici.</summary>
-        private void Register(CardModel card)
-        {
-            if (string.IsNullOrEmpty(card.Id)) return;
-
-            // Indice per ID
-            _byId[card.Id] = card;
-
-            // Indice per tag
-            foreach (var tag in card.Tags)
-            {
-                if (!_byTag.TryGetValue(tag, out var tagList))
-                {
-                    tagList = new List<CardModel>();
-                    _byTag[tag] = tagList;
-                }
-                tagList.Add(card);
-            }
-
-            // Indice per rarità
-            if (!_byRarity.TryGetValue(card.CardRarity, out var rarityList))
-            {
-                rarityList = new List<CardModel>();
-                _byRarity[card.CardRarity] = rarityList;
-            }
-            rarityList.Add(card);
-
-            // Indice per classe
-            var classes = card.AllowedClasses;
-            if (classes == null || classes.Count == 0)
-            {
-                // Disponibile per tutti — registra in tutte le classi
-                foreach (CharacterClass cls in Enum.GetValues<CharacterClass>())
-                {
-                    AddToClassIndex(cls, card);
-                }
-            }
-            else
-            {
-                foreach (var cls in classes)
-                    AddToClassIndex(cls, card);
-            }
-        }
-
-        private void AddToClassIndex(CharacterClass cls, CardModel card)
-        {
-            if (!_byClass.TryGetValue(cls, out var list))
-            {
-                list = new List<CardModel>();
-                _byClass[cls] = list;
-            }
-            list.Add(card);
-        }
-
-        // ------------------------------------------------------------------
-        //  QUERY
-        // ------------------------------------------------------------------
-
-        /// <summary>
-        /// Restituisce la carta per ID. Null se non trovata.
-        /// </summary>
-        public CardModel? GetById(string id)
-            => _byId.TryGetValue(id, out var card) ? card : null;
-
-        /// <summary>
-        /// Restituisce tutte le carte con il tag specificato.
-        /// </summary>
-        public IReadOnlyList<CardModel> GetCardsByTag(string tag)
-            => _byTag.TryGetValue(tag, out var list)
-                ? list
-                : Array.Empty<CardModel>();
-
-        /// <summary>
-        /// Restituisce tutte le carte di una certa rarità.
-        /// </summary>
-        public IReadOnlyList<CardModel> GetCardsByRarity(CardRarity rarity)
-            => _byRarity.TryGetValue(rarity, out var list)
-                ? list
-                : Array.Empty<CardModel>();
-
-        /// <summary>
-        /// Restituisce tutte le carte equipaggiabili da un personaggio
-        /// al livello specificato.
-        /// </summary>
-        public IReadOnlyList<CardModel> GetCardsForCharacter(
-            CharacterClass characterClass,
-            int            level = 1)
-        {
-            if (!_byClass.TryGetValue(characterClass, out var list))
-                return Array.Empty<CardModel>();
-
-            return list
-                .Where(c => c.IsUnlockedAt(level))
-                .ToList();
-        }
-
-        /// <summary>
-        /// Restituisce tutte le carte con un tipo specifico.
-        /// </summary>
-        public IReadOnlyList<CardModel> GetCardsByType(CardType type)
-            => _byId.Values
-                .Where(c => c.CardType == type)
-                .ToList();
-
-        /// <summary>
-        /// Restituisce tutte le carte caricate.
-        /// </summary>
-        public IReadOnlyCollection<CardModel> GetAll()
-            => _byId.Values;
-
-        /// <summary>
-        /// Restituisce il numero totale di carte caricate.
-        /// </summary>
-        public int TotalCards => _byId.Count;
     }
 }
