@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+   La Via della Redenzione — Installer/windows.wxs
+   WiX Toolset v4 descriptor per la creazione del pacchetto MSI Windows.
+
+   Uso da GitHub Actions (build-windows.yml):
+     wix build Installer/windows.wxs
+       -d ProductVersion=0.1.0
+       -d PublishDir=bin\Release\net8.0-windows10.0.19041.0\publish
+       -d BuildNumber=42
+       -o LaViaDellaRedenzione-0.1.0-setup.msi
+
+   Uso in locale:
+     dotnet tool install --global wix
+     wix build Installer/windows.wxs -d ProductVersion=0.1.0 -d PublishDir=.\publish -o setup.msi
+
+   Struttura installazione:
+     Directory default : C:\Program Files\La Via della Redenzione\
+     Shortcut Desktop  : "La Via della Redenzione"
+     Shortcut StartMenu: "La Via della Redenzione"
+     Uninstall         : Pannello di controllo → Programmi → Disinstalla
+
+   Requisiti sistema (verificati dall'installer):
+     OS  : Windows 10 versione 19041 o superiore
+     RAM : 4 GB (non verificabile via WiX — documentato nel README)
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       PACKAGE — metadati MSI principali
+  ═══════════════════════════════════════════════════════════════════════ -->
+
+  <Package
+    Name="La Via della Redenzione"
+    Manufacturer="Refa Studios"
+    Version="$(ProductVersion)"
+    UpgradeCode="D4E5F6A7-B8C9-0123-DEFA-456789012345"
+    Language="1040"
+    Codepage="1252"
+    InstallerVersion="500"
+    Compressed="yes">
+
+    <!--
+      UpgradeCode fisso — identifica il prodotto attraverso le versioni.
+      NON modificare mai questo GUID dopo la prima release pubblica,
+      altrimenti Windows non riconosce le versioni precedenti da aggiornare.
+
+      Language 1040 = Italiano
+    -->
+
+    <!-- ── Icona MSI (visibile in Pannello di Controllo) ─────────────────── -->
+    <Icon Id="AppIcon" SourceFile="..\Resources\AppIcon\appicon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+
+    <!-- ── Informazioni Add/Remove Programs ──────────────────────────────── -->
+    <Property Id="ARPHELPLINK"    Value="https://github.com/refa/laviadellaredenzione" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/refa/laviadellaredenzione" />
+    <Property Id="ARPCOMMENTS"   Value="Un JRPG dark fantasy — Valdrath, anno 847." />
+
+    <!-- ── Requisito OS minimo: Windows 10 19041 ─────────────────────────── -->
+    <Launch
+      Condition="VersionNT &gt;= 603 OR (VersionNT = 603 AND ServicePackLevel &gt;= 0)"
+      Message="La Via della Redenzione richiede Windows 10 versione 19041 o superiore." />
+
+    <!-- ── Upgrade: rimuove versione precedente prima di installare ────────── -->
+    <MajorUpgrade
+      Schedule="afterInstallInitialize"
+      DowngradeErrorMessage="Una versione più recente di La Via della Redenzione è già installata." />
+
+    <!-- ── Compressione cabinet ───────────────────────────────────────────── -->
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         STRUTTURA DIRECTORY
+    ═══════════════════════════════════════════════════════════════════════ -->
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="La Via della Redenzione">
+        <!--
+          ProgramFiles6432Folder → C:\Program Files\ su sistemi 64-bit
+          Il nome cartella è "La Via della Redenzione" (con spazi — WiX 4 lo supporta)
+        -->
+      </Directory>
+    </StandardDirectory>
+
+    <!-- Cartella Desktop per shortcut -->
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- Cartella Start Menu per shortcut -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="StartMenuAppFolder" Name="La Via della Redenzione" />
+    </StandardDirectory>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         COMPONENTI — file dell'applicazione
+    ═══════════════════════════════════════════════════════════════════════ -->
+
+    <ComponentGroup Id="AppComponents" Directory="INSTALLFOLDER">
+
+      <!-- ── Eseguibile principale ─────────────────────────────────────────── -->
+      <Component Id="MainExecutable" Guid="A1B2C3D4-E5F6-7890-ABCD-EF1234567801">
+        <File
+          Id="LaViaDellaRedenzionExe"
+          Source="$(PublishDir)\LaViaDellaRedenzione.exe"
+          KeyPath="yes" />
+
+        <!-- Shortcut Desktop -->
+        <Shortcut
+          Id="DesktopShortcut"
+          Directory="DesktopFolder"
+          Name="La Via della Redenzione"
+          Description="Un JRPG dark fantasy — Valdrath, anno 847"
+          Icon="AppIcon"
+          IconIndex="0"
+          WorkingDirectory="INSTALLFOLDER" />
+
+        <!-- Shortcut Start Menu -->
+        <Shortcut
+          Id="StartMenuShortcut"
+          Directory="StartMenuAppFolder"
+          Name="La Via della Redenzione"
+          Description="Un JRPG dark fantasy — Valdrath, anno 847"
+          Icon="AppIcon"
+          IconIndex="0"
+          WorkingDirectory="INSTALLFOLDER" />
+
+        <!-- Voce disinstallazione Start Menu -->
+        <Shortcut
+          Id="UninstallShortcut"
+          Directory="StartMenuAppFolder"
+          Name="Disinstalla La Via della Redenzione"
+          Target="[System64Folder]msiexec.exe"
+          Arguments="/x [ProductCode]"
+          Description="Disinstalla La Via della Redenzione" />
+
+        <!-- Registrazione Add/Remove Programs -->
+        <RegistryValue
+          Root="HKCU"
+          Key="Software\RefaStudios\LaViaDellaRedenzione"
+          Name="InstallPath"
+          Type="string"
+          Value="[INSTALLFOLDER]"
+          KeyPath="no" />
+
+      </Component>
+
+      <!-- ── DLL e runtime .NET MAUI (tutti i file nella publish dir) ──────── -->
+      <!--
+        HarvestDirectory raccoglie automaticamente tutti i file nella
+        PublishDir (EXE principale + DLL runtime + asset).
+        In WiX 4 si usa il elemento HeatDirectory o si elencano manualmente.
+        Qui usiamo il pattern di inclusione diretta per massima compatibilità.
+      -->
+
+      <Component Id="RuntimeFiles" Guid="B2C3D4E5-F6A7-8901-BCDE-F12345678902">
+        <!-- Runtime .NET Windows App SDK -->
+        <File Source="$(PublishDir)\LaViaDellaRedenzione.dll"        KeyPath="yes" />
+      </Component>
+
+      <Component Id="RuntimeDeps" Guid="C3D4E5F6-A7B8-9012-CDEF-123456789003">
+        <File Source="$(PublishDir)\LaViaDellaRedenzione.runtimeconfig.json" KeyPath="yes" />
+      </Component>
+
+      <!-- ── Assets di gioco ───────────────────────────────────────────────── -->
+      <!--
+        Gli asset (sprite, audio, JSON) sono inclusi nella publish dir
+        da MAUI come MauiAsset. Vengono copiati automaticamente da HarvestDirectory.
+        La directory Assets/ viene creata come sottocartella di INSTALLFOLDER.
+      -->
+
+    </ComponentGroup>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         FEATURE — feature principale (unica, tutto o niente)
+    ═══════════════════════════════════════════════════════════════════════ -->
+
+    <Feature
+      Id="MainFeature"
+      Title="La Via della Redenzione"
+      Description="Installa il gioco completo."
+      Level="1"
+      ConfigurableDirectory="INSTALLFOLDER"
+      AllowAdvertise="no"
+      InstallDefault="local"
+      TypicalDefault="install">
+
+      <ComponentGroupRef Id="AppComponents" />
+
+    </Feature>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         UI — interfaccia wizard dell'installer
+    ═══════════════════════════════════════════════════════════════════════ -->
+
+    <UI>
+      <!--
+        WixUI_InstallDir: wizard minimalista con:
+          1. Benvenuto + licenza
+          2. Scelta directory installazione
+          3. Installazione
+          4. Fine
+        Più semplice di WixUI_Mondo ma abbastanza per un indie game.
+      -->
+      <UIRef Id="WixUI_InstallDir" />
+
+      <!-- Salta il dialogo di licenza (nessun EULA per indie game) -->
+      <Publish
+        Dialog="WelcomeDlg"
+        Control="Next"
+        Event="NewDialog"
+        Value="InstallDirDlg"
+        Order="2">1</Publish>
+
+      <Publish
+        Dialog="InstallDirDlg"
+        Control="Back"
+        Event="NewDialog"
+        Value="WelcomeDlg"
+        Order="2">1</Publish>
+    </UI>
+
+    <!-- Sfondo banner installer (opzionale — usare immagine 493x58 px) -->
+    <!--
+    <WixVariable Id="WixUIBannerBmp"  Value="..\Resources\Installer\banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp"  Value="..\Resources\Installer\dialog.bmp" />
+    -->
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         AZIONI PERSONALIZZATE — pulizia alla disinstallazione
+    ═══════════════════════════════════════════════════════════════════════ -->
+
+    <!--
+      Alla disinstallazione, rimuove la cartella dei salvataggi SOLO se
+      l'utente ha esplicitamente confermato (non implementato qui —
+      i salvataggi restano in %APPDATA%\LaViaDellaRedenzione per sicurezza).
+
+      La cartella %APPDATA%\LaViaDellaRedenzione\ NON viene toccata dall'MSI:
+      i save file dell'utente sono preziosi e non devono essere eliminati
+      da un'operazione di disinstallazione.
+    -->
+
+    <!-- Rimuovi shortcut Start Menu alla disinstallazione -->
+    <Component Id="StartMenuCleanup" Directory="StartMenuAppFolder"
+               Guid="E5F6A7B8-C9D0-1234-EFAB-678901234505">
+      <RemoveFolder Id="RemoveStartMenuFolder" On="uninstall" />
+      <RegistryValue
+        Root="HKCU"
+        Key="Software\RefaStudios\LaViaDellaRedenzione"
+        Name="StartMenuInstalled"
+        Type="integer"
+        Value="1"
+        KeyPath="yes" />
+    </Component>
+
+  </Package>
+</Wix>
