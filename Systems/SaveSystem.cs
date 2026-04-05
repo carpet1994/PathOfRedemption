@@ -583,8 +583,15 @@ namespace LaViaDellaRedenzione.Systems
             // Migrazione v0 → v1
             if (fromVersion < 1)
             {
-                // v1: aggiunge KaelMorale (default 100 se mancante)
-                if (data.KaelMorale == 0) data.KaelMorale = 100;
+                // v1: aggiunge KaelMorale.
+                // I save v0 non contenevano questo campo: Newtonsoft.Json lo
+                // deserializza al default del tipo (int → 0). Il valore 0 qui
+                // non può mai essere un valore reale del giocatore, perché il
+                // campo non esisteva nel formato v0. Lo impostiamo sempre a 100
+                // invece di controllare == 0, evitando il falso-reset su save
+                // v1+ in cui il giocatore avesse effettivamente portato il
+                // Morale a zero.
+                data.KaelMorale = 100;
 
                 // v1: aggiunge IsNewGamePlus (default false)
                 // Già gestito dal default della proprietà
