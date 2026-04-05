@@ -395,10 +395,15 @@ namespace LaViaDellaRedenzione.Systems
         /// <summary>
         /// Esegue un autosave silenzioso.
         /// Chiamato da GameStateManager.OnStateChanged e dopo ogni battaglia.
+        /// OnAutosaveTriggered viene sparato solo se il salvataggio verrà
+        /// effettivamente eseguito: se IsSaving è già true il salvataggio
+        /// verrebbe scartato da SaveAsync, quindi l'evento non viene emesso
+        /// per evitare inconsistenze nell'UI (icona senza salvataggio reale).
         /// </summary>
         public async Task AutosaveAsync()
         {
             if (Current == null || ActiveSlot < 0) return;
+            if (IsSaving) return;
 
             OnAutosaveTriggered?.Invoke(ActiveSlot);
             await SaveCurrentAsync();
