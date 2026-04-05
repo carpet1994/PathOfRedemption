@@ -4,8 +4,7 @@
 //
 //  Descrizione : D-Pad virtuale touch per Android. ContentView MAUI che
 //                disegna un cerchio semi-trasparente con croce direzionale
-//                e gestisce i gesti touch (tap e pan) delegando al
-//                TouchInputHandler.
+//                e gestisce i gesti touch (tap e pan).
 //
 //  Posizionamento:
 //    Lato sinistro dello schermo, fascia inferiore.
@@ -22,10 +21,22 @@
 //  Rendering:
 //    Usa MAUI GraphicsView con IDrawable per disegnare il D-Pad
 //    con Canvas 2D. Nessuna immagine esterna richiesta.
+//
+//  CORREZIONE BUG:
+//    Il file originale importava LaViaDellaRedenzione.Platforms.Android
+//    e riceveva TouchInputHandler direttamente nel costruttore. Essendo
+//    questo file in /UI/ (compilato su tutte le piattaforme), la build
+//    Windows falliva perché TouchInputHandler esiste solo nella build Android.
+//    La dipendenza è stata invertita tramite delegate statici (stesso pattern
+//    usato per InputHintBar.GamepadHintResolver):
+//      VirtualDPad.DPadTouchHandler  — iniettato da TouchInputHandler su Android
+//      VirtualDPad.ScreenTapHandler  — iniettato da TouchInputHandler su Android
+//    Su Windows i delegate restano null e non vengono mai invocati perché
+//    VirtualDPad.IsVisible è false (PlatformAdaptiveLayout).
 // =============================================================================
 
 using LaViaDellaRedenzione.Core;
-using LaViaDellaRedenzione.Platforms.Android;
+using LaViaDellaRedenzione.Systems;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 using System;
@@ -49,10 +60,10 @@ namespace LaViaDellaRedenzione.UI
         public bool ActiveRight { get; set; }
 
         // Colori
-        private static readonly Color BgColor      = Color.FromRgba(255, 255, 255, 80);   // bianco 31% opacity
-        private static readonly Color ArrowColor    = Color.FromRgba(255, 255, 255, 160);  // bianco 63%
-        private static readonly Color ArrowActive   = Color.FromRgba(255, 255, 255, 255);  // bianco pieno
-        private static readonly Color RimColor      = Color.FromRgba(255, 255, 255, 50);   // bordo sottile
+        private static readonly Color BgColor    = Color.FromRgba(255, 255, 255, 80);
+        private static readonly Color ArrowColor  = Color.FromRgba(255, 255, 255, 160);
+        private static readonly Color ArrowActive = Color.FromRgba(255, 255, 255, 255);
+        private static readonly Color RimColor    = Color.FromRgba(255, 255, 255, 50);
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
@@ -75,21 +86,21 @@ namespace LaViaDellaRedenzione.UI
             canvas.FillCircle(cx, cy, r * 0.18f);
 
             // ── Frecce direzionali ───────────────────────────────────────────
-            DrawArrow(canvas, cx, cy - arrowDist, 0f,    arrowSize, ActiveUp);    // Su
-            DrawArrow(canvas, cx, cy + arrowDist, 180f,  arrowSize, ActiveDown);  // Giù
-            DrawArrow(canvas, cx - arrowDist, cy, 90f,   arrowSize, ActiveLeft);  // Sinistra
-            DrawArrow(canvas, cx + arrowDist, cy, 270f,  arrowSize, ActiveRight); // Destra
+            DrawArrow(canvas, cx, cy - arrowDist, 0f,   arrowSize, ActiveUp);    // Su
+            DrawArrow(canvas, cx, cy + arrowDist, 180f, arrowSize, ActiveDown);  // Giù
+            DrawArrow(canvas, cx - arrowDist, cy, 90f,  arrowSize, ActiveLeft);  // Sinistra
+            DrawArrow(canvas, cx + arrowDist, cy, 270f, arrowSize, ActiveRight); // Destra
 
             // ── Linee della croce ────────────────────────────────────────────
             canvas.StrokeColor = Color.FromRgba(255, 255, 255, 30);
             canvas.StrokeSize  = 1f;
-            canvas.DrawLine(cx - r * 0.85f, cy, cx + r * 0.85f, cy);  // orizzontale
-            canvas.DrawLine(cx, cy - r * 0.85f, cx, cy + r * 0.85f);  // verticale
+            canvas.DrawLine(cx - r * 0.85f, cy, cx + r * 0.85f, cy);
+            canvas.DrawLine(cx, cy - r * 0.85f, cx, cy + r * 0.85f);
         }
 
         /// <summary>
         /// Disegna una freccia triangolare centrata in (x, y).
-        /// rotation: 0 = punta su, 180 = punta giù, 90 = punta sinistra, 270 = punta destra.
+        /// rotation: 0 = punta su, 180 = punta giù, 90 = sinistra, 270 = destra.
         /// </summary>
         private static void DrawArrow(
             ICanvas canvas,
@@ -103,7 +114,7 @@ namespace LaViaDellaRedenzione.UI
             canvas.Rotate(rotation);
 
             var path = new PathF();
-            path.MoveTo(0,        -size * 0.5f);   // punta
+            path.MoveTo(0,           -size * 0.5f);
             path.LineTo(-size * 0.45f, size * 0.4f);
             path.LineTo( size * 0.45f, size * 0.4f);
             path.Close();
@@ -134,12 +145,39 @@ namespace LaViaDellaRedenzione.UI
     public sealed class VirtualDPad : ContentView
     {
         // ------------------------------------------------------------------
-        //  Handler e drawable
+        //  Delegate iniettati da TouchInputHandler (solo su Android)
+        //
+        //  TouchInputHandler li imposta nel proprio costruttore:
+        //    VirtualDPad.DPadTouchHandler  = OnDPadTouch;
+        //    VirtualDPad.ScreenTapHandler  = OnScreenTap;
+        //    VirtualDPad.SetBoundsCallback = SetDPadBounds;
+        //  Su Windows restano null — non vengono mai chiamati perché
+        //  VirtualDPad è nascosto (IsVisible = false).
         // ------------------------------------------------------------------
 
-        private readonly TouchInputHandler _handler;
-        private readonly DPadDrawable      _drawable = new();
-        private readonly GraphicsView      _graphicsView;
+        /// <summary>
+        /// Chiamato quando il dito si muove sul D-Pad.
+        /// Parametri: touchX, touchY (coordinate assolute schermo), isDown.
+        /// </summary>
+        public static Action<float, float, bool>? DPadTouchHandler { get; set; }
+
+        /// <summary>
+        /// Chiamato per un tap singolo fuori dal pan (skip cutscene, conferma).
+        /// </summary>
+        public static Action? ScreenTapHandler { get; set; }
+
+        /// <summary>
+        /// Chiamato quando il layout cambia per aggiornare i bounds nell'handler.
+        /// Parametri: centerX, centerY, radius (tutti in coordinate assolute schermo).
+        /// </summary>
+        public static Action<float, float, float>? SetBoundsCallback { get; set; }
+
+        // ------------------------------------------------------------------
+        //  Drawable e view
+        // ------------------------------------------------------------------
+
+        private readonly DPadDrawable _drawable = new();
+        private readonly GraphicsView _graphicsView;
 
         // ------------------------------------------------------------------
         //  Stato touch corrente
@@ -151,11 +189,8 @@ namespace LaViaDellaRedenzione.UI
         //  Costruttore
         // ------------------------------------------------------------------
 
-        public VirtualDPad(TouchInputHandler handler)
+        public VirtualDPad()
         {
-            _handler = handler ?? throw new ArgumentNullException(nameof(handler));
-
-            // GraphicsView per rendering Canvas 2D
             _graphicsView = new GraphicsView
             {
                 Drawable          = _drawable,
@@ -166,13 +201,10 @@ namespace LaViaDellaRedenzione.UI
 
             Content = _graphicsView;
 
-            // Dimensione minima per usabilità su dispositivi piccoli
             MinimumWidthRequest  = 130;
             MinimumHeightRequest = 130;
+            BackgroundColor      = Colors.Transparent;
 
-            BackgroundColor = Colors.Transparent;
-
-            // Registra gesture recognizer
             AttachGestureRecognizers();
         }
 
@@ -203,7 +235,7 @@ namespace LaViaDellaRedenzione.UI
                     case GestureStatus.Canceled:
                         _isTouching = false;
                         ResetArrows();
-                        _handler.OnDPadTouch(0, 0, false);
+                        DPadTouchHandler?.Invoke(0, 0, false);
                         break;
                 }
             };
@@ -215,10 +247,8 @@ namespace LaViaDellaRedenzione.UI
 
             tap.Tapped += (s, e) =>
             {
-                // Un tap singolo registra Confirm (per menu e dialoghi)
-                // Solo se non è in corso un pan (D-Pad navigazione)
                 if (!_isTouching)
-                    _handler.OnScreenTap();
+                    ScreenTapHandler?.Invoke();
             };
 
             GestureRecognizers.Add(tap);
@@ -228,39 +258,25 @@ namespace LaViaDellaRedenzione.UI
         //  AGGIORNAMENTO TOUCH
         // ------------------------------------------------------------------
 
-        /// <summary>
-        /// Calcola la posizione touch assoluta sullo schermo e la passa
-        /// all'handler. Aggiorna lo stato visivo del drawable.
-        /// </summary>
         private void UpdateDPadTouch(Point touchPos, bool isDown)
         {
-            // Centro del D-Pad in coordinate assolute schermo
             float centerX = (float)(X + Width  * 0.5);
             float centerY = (float)(Y + Height * 0.5);
             float radius  = (float)(MathF.Min(Width, Height) * 0.5 * 0.92);
 
-            // Aggiorna bounds nel TouchInputHandler
-            _handler.SetDPadBounds(centerX, centerY, radius);
+            SetBoundsCallback?.Invoke(centerX, centerY, radius);
 
-            // Passa il touch all'handler
-            _handler.OnDPadTouch((float)touchPos.X + (float)X,
-                                  (float)touchPos.Y + (float)Y,
-                                  isDown);
+            DPadTouchHandler?.Invoke(
+                (float)touchPos.X + (float)X,
+                (float)touchPos.Y + (float)Y,
+                isDown);
 
-            // Aggiorna stato visivo frecce
             UpdateArrowVisuals();
         }
 
-        /// <summary>
-        /// Ottiene la posizione del touch dal PanGestureUpdatedEventArgs.
-        /// Le coordinate sono relative al ContentView.
-        /// </summary>
         private static Point GetTouchPosition(PanUpdatedEventArgs e)
             => new Point(e.TotalX, e.TotalY);
 
-        /// <summary>
-        /// Sincronizza lo stato visivo delle frecce con l'InputSystem.
-        /// </summary>
         private void UpdateArrowVisuals()
         {
             var input = InputSystem.Instance;
@@ -275,14 +291,10 @@ namespace LaViaDellaRedenzione.UI
             _drawable.ActiveLeft  = input.IsPressed(InputAction.NavigateLeft);
             _drawable.ActiveRight = input.IsPressed(InputAction.NavigateRight);
 
-            // Ridisegna solo se lo stato è cambiato
             if (changed)
                 _graphicsView.Invalidate();
         }
 
-        /// <summary>
-        /// Resetta tutte le frecce a stato non attivo e ridisegna.
-        /// </summary>
         private void ResetArrows()
         {
             _drawable.ActiveUp    = false;
@@ -296,12 +308,6 @@ namespace LaViaDellaRedenzione.UI
         //  LAYOUT
         // ------------------------------------------------------------------
 
-        /// <summary>
-        /// Override per aggiornare i bounds del D-Pad nell'handler
-        /// quando il layout cambia (rotazione, ridimensionamento).
-        /// Su Android l'orientamento è fisso portrait — questo serve
-        /// principalmente per l'inizializzazione.
-        /// </summary>
         protected override void OnSizeAllocated(double width, double height)
         {
             base.OnSizeAllocated(width, height);
@@ -311,7 +317,7 @@ namespace LaViaDellaRedenzione.UI
                 float centerX = (float)(X + width  * 0.5);
                 float centerY = (float)(Y + height * 0.5);
                 float radius  = (float)(MathF.Min(width, height) * 0.5 * 0.92);
-                _handler.SetDPadBounds(centerX, centerY, radius);
+                SetBoundsCallback?.Invoke(centerX, centerY, radius);
             }
         }
     }

@@ -7,13 +7,12 @@
 //                MAUI con rendering Canvas 2D e supporto multi-touch.
 //
 //  Layout rombo:
-//    Alto   → ActionA (Usa Carta)   — blu   (#3B82F6)
-//    Destra → ActionB (Difendi)     — verde (#22C55E)
-//    Basso  → ActionC (Oggetti)     — giallo(#EAB308)
-//    Sinistra→ActionD (Fuggi)       — rosso (#EF4444)
+//    Alto    → ActionA (Usa Carta)  — blu   (#3B82F6)
+//    Destra  → ActionB (Difendi)   — verde (#22C55E)
+//    Basso   → ActionC (Oggetti)   — giallo(#EAB308)
+//    Sinistra→ ActionD (Fuggi)     — rosso (#EF4444)
 //
-//  Pulsante separato Cancel/Pausa in alto a destra dello schermo
-//  (gestito da VirtualPauseButton, classe separata in fondo al file).
+//  Pulsante separato Cancel/Pausa: VirtualPauseButton (in fondo al file).
 //
 //  Posizionamento (impostato da GameManager):
 //    AbsoluteLayout.LayoutBounds = (0.6, 0.7, 0.4, 0.3)
@@ -21,14 +20,18 @@
 //
 //  Multi-touch:
 //    Ogni dito ha un touchId univoco. Più pulsanti possono essere premuti
-//    contemporaneamente (es. Usa Carta + Difendi in sequenza rapida).
+//    contemporaneamente.
 //
-//  Visibilità:
-//    IsVisible = false su Windows (PlatformAdaptiveLayout).
+//  CORREZIONE BUG:
+//    Come VirtualDPad.cs, il file originale importava Platforms.Android
+//    e richiedeva TouchInputHandler nel costruttore, rompendo la build
+//    Windows. La dipendenza è stata sostituita con delegate statici
+//    iniettati da TouchInputHandler sul solo target Android:
+//      VirtualActionButtons.ActionButtonTouchHandler
+//      VirtualActionButtons.CancelButtonTouchHandler
 // =============================================================================
 
 using LaViaDellaRedenzione.Core;
-using LaViaDellaRedenzione.Platforms.Android;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 using System;
@@ -40,19 +43,11 @@ namespace LaViaDellaRedenzione.UI
     //  DEFINIZIONE PULSANTE
     // -------------------------------------------------------------------------
 
-    /// <summary>
-    /// Dati di un singolo pulsante nel layout a rombo.
-    /// </summary>
     internal sealed class ActionButtonDef
     {
-        public InputAction Action  { get; init; }
+        public InputAction Action { get; init; }
         public string      Label  { get; init; } = string.Empty;
         public Color       Color  { get; init; } = Colors.White;
-
-        /// <summary>
-        /// Posizione normalizzata (0..1) nel ContentView.
-        /// Calcolata geometricamente dal rombo.
-        /// </summary>
         public float NormX { get; init; }
         public float NormY { get; init; }
     }
@@ -65,16 +60,12 @@ namespace LaViaDellaRedenzione.UI
     {
         private readonly ActionButtonDef[] _buttons;
 
-        /// <summary>Set delle azioni attualmente premute (per highlight).</summary>
         public readonly HashSet<InputAction> ActiveActions = new();
-
-        /// <summary>Raggio di ogni pulsante in pixel logici.</summary>
         public float ButtonRadius { get; set; } = 28f;
 
-        // Colori UI
-        private static readonly Color LabelColor  = Color.FromRgba(255, 255, 255, 220);
-        private static readonly Color PressedRim  = Colors.White;
-        private static readonly Color NormalRim   = Color.FromRgba(255, 255, 255, 80);
+        private static readonly Color LabelColor = Color.FromRgba(255, 255, 255, 220);
+        private static readonly Color PressedRim = Colors.White;
+        private static readonly Color NormalRim  = Color.FromRgba(255, 255, 255, 80);
 
         public ActionButtonsDrawable(ActionButtonDef[] buttons)
             => _buttons = buttons;
@@ -86,11 +77,10 @@ namespace LaViaDellaRedenzione.UI
 
             foreach (var btn in _buttons)
             {
-                float cx = btn.NormX * w;
-                float cy = btn.NormY * h;
+                float cx     = btn.NormX * w;
+                float cy     = btn.NormY * h;
                 bool  active = ActiveActions.Contains(btn.Action);
 
-                // ── Cerchio di sfondo ──────────────────────────────────────
                 byte alpha = active ? (byte)220 : (byte)130;
                 canvas.FillColor = Color.FromRgba(
                     (byte)(btn.Color.Red   * 255),
@@ -99,30 +89,25 @@ namespace LaViaDellaRedenzione.UI
                     alpha);
                 canvas.FillCircle(cx, cy, ButtonRadius);
 
-                // ── Bordo ─────────────────────────────────────────────────
                 canvas.StrokeColor = active ? PressedRim : NormalRim;
                 canvas.StrokeSize  = active ? 2.5f : 1.5f;
                 canvas.DrawCircle(cx, cy, ButtonRadius);
 
-                // ── Label (lettera) ────────────────────────────────────────
                 canvas.FontColor = LabelColor;
                 canvas.FontSize  = ButtonRadius * 0.72f;
                 canvas.DrawString(
                     btn.Label,
                     cx - ButtonRadius, cy - ButtonRadius,
-                    ButtonRadius * 2, ButtonRadius * 2,
+                    ButtonRadius * 2,  ButtonRadius * 2,
                     HorizontalAlignment.Center,
                     VerticalAlignment.Center);
             }
         }
 
-        /// <summary>Calcola il raggio del pulsante in base alla dimensione del view.</summary>
         public void UpdateButtonRadius(float viewWidth, float viewHeight)
         {
             float minDim = MathF.Min(viewWidth, viewHeight);
-            ButtonRadius = minDim * 0.20f;
-            // Clamp: minimo 22px (dispositivi piccoli), massimo 40px (tablet)
-            ButtonRadius = Math.Clamp(ButtonRadius, 22f, 40f);
+            ButtonRadius = Math.Clamp(minDim * 0.20f, 22f, 40f);
         }
     }
 
@@ -137,49 +122,54 @@ namespace LaViaDellaRedenzione.UI
     public sealed class VirtualActionButtons : ContentView
     {
         // ------------------------------------------------------------------
-        //  Definizioni pulsanti (layout a rombo)
+        //  Delegate iniettati da TouchInputHandler (solo su Android)
+        //
+        //  TouchInputHandler li imposta nel proprio costruttore:
+        //    VirtualActionButtons.ActionButtonTouchHandler = OnActionButtonTouch;
+        //    VirtualActionButtons.CancelButtonTouchHandler = OnCancelButtonTouch;
         // ------------------------------------------------------------------
 
         /// <summary>
-        /// Posizioni normalizzate nel rombo:
-        ///   Alto    (0.5, 0.1)
-        ///   Destra  (0.9, 0.5)
-        ///   Basso   (0.5, 0.9)
-        ///   Sinistra(0.1, 0.5)
+        /// Chiamato al press/release di un pulsante azione.
+        /// Parametri: touchId, InputAction, isDown.
         /// </summary>
+        public static Action<long, InputAction, bool>? ActionButtonTouchHandler { get; set; }
+
+        /// <summary>
+        /// Chiamato al press/release del pulsante Cancel/Pausa.
+        /// Parametro: isDown.
+        /// </summary>
+        public static Action<bool>? CancelButtonTouchHandler { get; set; }
+
+        // ------------------------------------------------------------------
+        //  Definizioni pulsanti
+        // ------------------------------------------------------------------
+
         private static readonly ActionButtonDef[] ButtonDefs = new[]
         {
             new ActionButtonDef
             {
-                Action = InputAction.ActionA,
-                Label  = "A",
-                Color  = Color.FromRgb(59,  130, 246),  // blu
-                NormX  = 0.5f,
-                NormY  = 0.10f
+                Action = InputAction.ActionA, Label = "A",
+                Color  = Color.FromRgb(59,  130, 246),   // blu
+                NormX  = 0.5f, NormY = 0.10f
             },
             new ActionButtonDef
             {
-                Action = InputAction.ActionB,
-                Label  = "B",
-                Color  = Color.FromRgb(34,  197, 94),   // verde
-                NormX  = 0.90f,
-                NormY  = 0.5f
+                Action = InputAction.ActionB, Label = "B",
+                Color  = Color.FromRgb(34,  197, 94),    // verde
+                NormX  = 0.90f, NormY = 0.5f
             },
             new ActionButtonDef
             {
-                Action = InputAction.ActionC,
-                Label  = "C",
-                Color  = Color.FromRgb(234, 179, 8),    // giallo
-                NormX  = 0.5f,
-                NormY  = 0.90f
+                Action = InputAction.ActionC, Label = "C",
+                Color  = Color.FromRgb(234, 179, 8),     // giallo
+                NormX  = 0.5f, NormY = 0.90f
             },
             new ActionButtonDef
             {
-                Action = InputAction.ActionD,
-                Label  = "D",
-                Color  = Color.FromRgb(239, 68,  68),   // rosso
-                NormX  = 0.10f,
-                NormY  = 0.5f
+                Action = InputAction.ActionD, Label = "D",
+                Color  = Color.FromRgb(239, 68,  68),    // rosso
+                NormX  = 0.10f, NormY = 0.5f
             }
         };
 
@@ -187,32 +177,24 @@ namespace LaViaDellaRedenzione.UI
         //  Componenti
         // ------------------------------------------------------------------
 
-        private readonly TouchInputHandler       _handler;
-        private readonly ActionButtonsDrawable   _drawable;
-        private readonly GraphicsView            _graphicsView;
+        private readonly ActionButtonsDrawable _drawable;
+        private readonly GraphicsView          _graphicsView;
 
-        // ------------------------------------------------------------------
-        //  Tracking touch per multi-touch
-        // ------------------------------------------------------------------
-
-        /// <summary>Mappa touchId → pulsante premuto.</summary>
         private readonly Dictionary<long, ActionButtonDef> _activeTouches = new();
-
         private long _nextTouchId = 0;
 
         // ------------------------------------------------------------------
         //  Costruttore
         // ------------------------------------------------------------------
 
-        public VirtualActionButtons(TouchInputHandler handler)
+        public VirtualActionButtons()
         {
-            _handler  = handler ?? throw new ArgumentNullException(nameof(handler));
             _drawable = new ActionButtonsDrawable(ButtonDefs);
 
             _graphicsView = new GraphicsView
             {
-                Drawable        = _drawable,
-                BackgroundColor = Colors.Transparent,
+                Drawable          = _drawable,
+                BackgroundColor   = Colors.Transparent,
                 HorizontalOptions = LayoutOptions.Fill,
                 VerticalOptions   = LayoutOptions.Fill
             };
@@ -232,7 +214,6 @@ namespace LaViaDellaRedenzione.UI
 
         private void AttachGestureRecognizers()
         {
-            // ── Pan per hold e multi-touch ────────────────────────────────
             var pan = new PanGestureRecognizer();
 
             pan.PanUpdated += (s, e) =>
@@ -247,7 +228,7 @@ namespace LaViaDellaRedenzione.UI
                             long id = _nextTouchId++;
                             _activeTouches[id] = btn;
                             _drawable.ActiveActions.Add(btn.Action);
-                            _handler.OnActionButtonTouch(id, btn.Action, true);
+                            ActionButtonTouchHandler?.Invoke(id, btn.Action, true);
                             _graphicsView.Invalidate();
                         }
                         break;
@@ -256,11 +237,10 @@ namespace LaViaDellaRedenzione.UI
                     case GestureStatus.Completed:
                     case GestureStatus.Canceled:
                     {
-                        // Rilascia tutti i touch attivi
                         foreach (var kvp in _activeTouches)
                         {
                             _drawable.ActiveActions.Remove(kvp.Value.Action);
-                            _handler.OnActionButtonTouch(kvp.Key, kvp.Value.Action, false);
+                            ActionButtonTouchHandler?.Invoke(kvp.Key, kvp.Value.Action, false);
                         }
                         _activeTouches.Clear();
                         _graphicsView.Invalidate();
@@ -271,32 +251,26 @@ namespace LaViaDellaRedenzione.UI
 
             GestureRecognizers.Add(pan);
 
-            // ── Tap discreto ─────────────────────────────────────────────
             var tap = new TapGestureRecognizer { NumberOfTapsRequired = 1 };
 
             tap.Tapped += (s, e) =>
             {
-                // Ottieni posizione tap
-                var pos  = e.GetPosition(_graphicsView);
+                var pos = e.GetPosition(_graphicsView);
                 if (pos == null) return;
 
                 var btn = HitTest((float)pos.Value.X, (float)pos.Value.Y);
                 if (btn == null) return;
 
-                // Simula press + release rapido per tap
                 long id = _nextTouchId++;
-                _handler.OnActionButtonTouch(id, btn.Action, true);
-
-                // Feedback visivo momentaneo
+                ActionButtonTouchHandler?.Invoke(id, btn.Action, true);
                 _drawable.ActiveActions.Add(btn.Action);
                 _graphicsView.Invalidate();
 
-                // Rilascia dopo 80ms (abbastanza per IsJustPressed nel GameLoop)
                 Microsoft.Maui.Controls.Application.Current?.Dispatcher.DispatchDelayed(
                     TimeSpan.FromMilliseconds(80),
                     () =>
                     {
-                        _handler.OnActionButtonTouch(id, btn.Action, false);
+                        ActionButtonTouchHandler?.Invoke(id, btn.Action, false);
                         _drawable.ActiveActions.Remove(btn.Action);
                         _graphicsView.Invalidate();
                     });
@@ -309,10 +283,6 @@ namespace LaViaDellaRedenzione.UI
         //  HIT TEST
         // ------------------------------------------------------------------
 
-        /// <summary>
-        /// Determina quale pulsante è stato toccato in base alla posizione
-        /// relativa al ContentView. Ritorna null se nessun pulsante è stato colpito.
-        /// </summary>
         private ActionButtonDef? HitTest(float localX, float localY)
         {
             float w = (float)Width;
@@ -326,8 +296,6 @@ namespace LaViaDellaRedenzione.UI
                 float dx = localX - cx;
                 float dy = localY - cy;
 
-                // Raggio di hit leggermente più grande del raggio visivo
-                // per migliorare l'usabilità su schermi piccoli
                 if (dx * dx + dy * dy <= (r * 1.2f) * (r * 1.2f))
                     return btn;
             }
@@ -352,27 +320,20 @@ namespace LaViaDellaRedenzione.UI
     }
 
     // =========================================================================
-    //  VIRTUAL PAUSE BUTTON — pulsante Cancel/Pausa separato
+    //  VIRTUAL PAUSE BUTTON
     // =========================================================================
 
     /// <summary>
     /// Pulsante piccolo per aprire il menu di pausa o annullare.
-    /// Posizionato in alto a destra dello schermo, sempre visibile
-    /// durante il gioco (side-scroll e battaglia).
+    /// Posizionato in alto a destra dello schermo.
     /// </summary>
     public sealed class VirtualPauseButton : ContentView
     {
-        private readonly TouchInputHandler _handler;
-        private bool _isPressed = false;
-
-        // Colori
         private static readonly Color BgNormal  = Color.FromRgba(255, 255, 255, 70);
         private static readonly Color BgPressed = Color.FromRgba(255, 255, 255, 160);
 
-        public VirtualPauseButton(TouchInputHandler handler)
+        public VirtualPauseButton()
         {
-            _handler = handler;
-
             var label = new Label
             {
                 Text              = "II",
@@ -395,19 +356,18 @@ namespace LaViaDellaRedenzione.UI
 
             Content = frame;
 
-            // Tap per pausa
             var tap = new TapGestureRecognizer();
             tap.Tapped += (s, e) =>
             {
                 frame.BackgroundColor = BgPressed;
-                _handler.OnCancelButtonTouch(true);
+                VirtualActionButtons.CancelButtonTouchHandler?.Invoke(true);
 
                 Application.Current?.Dispatcher.DispatchDelayed(
                     TimeSpan.FromMilliseconds(100),
                     () =>
                     {
                         frame.BackgroundColor = BgNormal;
-                        _handler.OnCancelButtonTouch(false);
+                        VirtualActionButtons.CancelButtonTouchHandler?.Invoke(false);
                     });
             };
 
