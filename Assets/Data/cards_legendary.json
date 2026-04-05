@@ -1,0 +1,169 @@
+[
+  {
+    "id": "CARD_KAEL_REDENZIONE_LEG",
+    "name": "Redenzione",
+    "description": "Kael attacca tutti i nemici con danno pari al 200% ATK (Luce). Se un alleato è KO, lo riporta a 50% HP. Per 3 turni, Kael è immune a stati psicologici.",
+    "flavorText": "Alla fine, la lama era pulita non solo di ruggine.",
+    "cardType": "Abilita",
+    "cardRarity": "Leggendaria",
+    "elementType": "Luce",
+    "spCost": 5,
+    "allowedClasses": ["Guerriero"],
+    "unlockLevel": 0,
+    "tags": ["kael", "luce", "redenzione", "greypass", "area", "supporto"],
+    "artworkPath": "Cards/kael_redenzione.png",
+    "statATK": 0,
+    "statMAG": 0,
+    "statDEF": 0,
+    "statRES": 0,
+    "statSPD": 0,
+    "statSP": 0,
+    "statHP": 0,
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "AllEnemies",
+        "baseValue": 0,
+        "scalingFormula": "ATK * 2.0",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Cura",
+        "target": "AllAllies",
+        "baseValue": 0,
+        "scalingFormula": "HP * 0.5",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Stato",
+        "target": "Self",
+        "statusEffect": "Ancorato",
+        "statusDuration": 3,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_SEI_SIGILLI_LEG",
+    "name": "Custode dei Sei Sigilli",
+    "description": "Attacco di area di tutti gli elementi. Purifica tutti gli stati negativi del gruppo. Per 2 turni i sigilli non si scaricano.",
+    "flavorText": "La sesta runa era sbiadita. Non spenta.",
+    "cardType": "Abilita",
+    "cardRarity": "Leggendaria",
+    "elementType": "Luce",
+    "spCost": 6,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["lyra", "sigillo", "custode", "luce", "area", "supporto", "purifica"],
+    "artworkPath": "Cards/lyra_sei_sigilli.png",
+    "statATK": 0,
+    "statMAG": 0,
+    "statDEF": 0,
+    "statRES": 0,
+    "statSPD": 0,
+    "statSP": 0,
+    "statHP": 0,
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "AllEnemies",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 3.0",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Buff",
+        "target": "AllAllies",
+        "statusEffect": "Ancorato",
+        "statusDuration": 2,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_VORAN_NUMERO_MINIMO_LEG",
+    "name": "Il Numero Minimo di Parole",
+    "description": "Passiva. Ogni carta di Voran costa 1 SP in meno (minimo 0). Quando Voran usa 3 carte nello stesso turno: attacco bonus gratuito.",
+    "flavorText": "Parla poco. Agisce invece.",
+    "cardType": "Passiva",
+    "cardRarity": "Leggendaria",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Mago"],
+    "unlockLevel": 0,
+    "tags": ["voran", "silenzio", "monastero", "sp", "passiva", "redenzione"],
+    "artworkPath": "Cards/voran_numero_minimo.png",
+    "statATK": 0,
+    "statMAG": 0,
+    "statDEF": 0,
+    "statRES": 0,
+    "statSPD": 0,
+    "statSP": 4,
+    "statHP": 0,
+    "effects": []
+  },
+  {
+    "id": "CARD_SERA_PASSO_SUCCESSIVO_LEG",
+    "name": "Il Passo Successivo",
+    "description": "Reazione. Quando un alleato cade a 0 HP, Sera interviene automaticamente con una cura del 40% HP max. Una volta per battaglia.",
+    "flavorText": "Aveva già capito che bisognava decidere il passo successivo.",
+    "cardType": "Reazione",
+    "cardRarity": "Leggendaria",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Esploratore"],
+    "unlockLevel": 0,
+    "tags": ["sera", "cura", "fiducia", "supporto", "reazione", "campagna"],
+    "artworkPath": "Cards/sera_passo_successivo.png",
+    "statATK": 0,
+    "statMAG": 0,
+    "statDEF": 0,
+    "statRES": 0,
+    "statSPD": 0,
+    "statSP": 0,
+    "statHP": 0,
+    "effects": [
+      {
+        "effectType": "Cura",
+        "target": "SingleAlly",
+        "baseValue": 0,
+        "scalingFormula": "HP * 0.4",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_SHARED_CROCE_GREYPASS_LEG",
+    "name": "Croce di Greypass",
+    "description": "Accessorio condiviso. +15% a tutte le statistiche. Se il portatore è sotto il 30% HP, tutti gli alleati guadagnano +20% ATK per 2 turni.",
+    "flavorText": "Non è un perdono. È la verità. È meglio.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Leggendaria",
+    "elementType": "Luce",
+    "spCost": 0,
+    "allowedClasses": null,
+    "unlockLevel": 0,
+    "tags": ["greypass", "condiviso", "accessorio", "luce", "redenzione", "harkon"],
+    "artworkPath": "Cards/croce_greypass.png",
+    "statATK": 8,
+    "statMAG": 8,
+    "statDEF": 8,
+    "statRES": 8,
+    "statSPD": 4,
+    "statSP": 4,
+    "statHP": 0,
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "AllAllies",
+        "statusEffect": "Potenziato",
+        "statusDuration": 2,
+        "statusIntensity": 1.2,
+        "statusChance": 1.0
+      }
+    ]
+  }
+]
