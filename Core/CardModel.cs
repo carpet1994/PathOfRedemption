@@ -144,18 +144,30 @@ namespace LaViaDellaRedenzione.Core
         public float SP  { get; set; }  // SP massimi
         public float LVL { get; set; }
 
-        public static StatContext FromCharacter(Character character) => new()
+        /// <summary>
+        /// Costruisce un StatContext da valori numerici espliciti.
+        /// Usato da BattleSystem prima che Character.cs sia disponibile,
+        /// e come API stabile a lungo termine.
+        /// </summary>
+        public static StatContext FromValues(
+            float atk, float mag, float def, float res,
+            float spd, float luk, float hp, float sp, float lvl) => new()
         {
-            ATK = character.ATK,
-            MAG = character.MAG,
-            DEF = character.DEF,
-            RES = character.RES,
-            SPD = character.SPD,
-            LUK = character.LUK,
-            HP  = character.MaxHP,
-            SP  = character.MaxSP,
-            LVL = character.Level
+            ATK = atk,
+            MAG = mag,
+            DEF = def,
+            RES = res,
+            SPD = spd,
+            LUK = luk,
+            HP  = hp,
+            SP  = sp,
+            LVL = lvl
         };
+
+        // NOTA: FromCharacter(Character character) è definito in Character.cs
+        // come metodo di estensione su StatContext, per evitare dipendenze
+        // circolari tra Core/CardModel.cs e Core/Character.cs.
+        // Uso: StatContext.FromCharacter(myCharacter) → vedi Character.cs
     }
 
     // =========================================================================
@@ -317,6 +329,13 @@ namespace LaViaDellaRedenzione.Core
 
         [JsonProperty("statSP")]
         public int StatSP  { get; set; } = 0;
+
+        /// <summary>
+        /// Bonus HP massimi conferiti dall'equipaggiamento.
+        /// Usato da CARD_SERA_HOLLOW_025 ("Il Cavo del Faggio") e carte simili.
+        /// </summary>
+        [JsonProperty("statHP")]
+        public int StatHP  { get; set; } = 0;
 
         // ------------------------------------------------------------------
         //  Fusione
