@@ -1,0 +1,476 @@
+[
+  {
+    "id": "CARD_LYRA_SEAL_001",
+    "name": "Sigillo di Contenimento",
+    "description": "Applica Rallentato e riduce la DEF del bersaglio. La tecnica dei Custodi dei Sigilli.",
+    "flavorText": "Le sei rune sul dorso della mano si illuminarono appena, come occhi che si aprono nel buio.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 2,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["sigillo", "custode", "lyra", "controllo", "debuff"],
+    "artworkPath": "Cards/lyra_seal.png",
+    "effects": [
+      {
+        "effectType": "Stato",
+        "target": "SingleEnemy",
+        "statusEffect": "Rallentato",
+        "statusDuration": 2,
+        "statusIntensity": 0.7,
+        "statusChance": 1.0
+      },
+      {
+        "effectType": "Debuff",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 0.4",
+        "statusEffect": "Depresso",
+        "statusDuration": 2,
+        "statusIntensity": 0.8,
+        "statusChance": 0.85
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_VIAL_002",
+    "name": "Fiale di Vetro Soffiato",
+    "description": "Cura un alleato e ripristina SP. Le fiale non si aprono mai davanti agli altri.",
+    "flavorText": "Ripose gli strumenti nella borsa con movimenti precisi, si alzò, e solo allora si voltò a guardarlo.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["cura", "lyra", "supporto", "sp", "fiale"],
+    "artworkPath": "Cards/lyra_vial.png",
+    "effects": [
+      {
+        "effectType": "Cura",
+        "target": "SingleAlly",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 0.8 + 20",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Buff",
+        "target": "SingleAlly",
+        "baseValue": 1,
+        "scalingFormula": ""
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_MAPS_003",
+    "name": "Mappe Interiori",
+    "description": "Passiva: rivela le debolezze elementali del nemico per 3 turni.",
+    "flavorText": "Sul dorso della mano destra aveva tatuate sei rune sottili, in fila. Non era decorazione — era una mappa.",
+    "cardType": "Passiva",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 3,
+    "tags": ["passiva", "lyra", "analisi", "debuff", "elemento"],
+    "artworkPath": "Cards/lyra_maps.png",
+    "statMAG": 5,
+    "effects": []
+  },
+  {
+    "id": "CARD_LYRA_LEAD_004",
+    "name": "Contenitore di Piombo",
+    "description": "Potente attacco Ombra su singolo bersaglio. Lyra non apre mai questo contenitore davanti agli altri.",
+    "flavorText": "Un contenitore di piombo sigillato che non apre mai davanti agli altri.",
+    "cardType": "Abilita",
+    "cardRarity": "Rara",
+    "elementType": "Ombra",
+    "spCost": 4,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 8,
+    "tags": ["danno", "lyra", "ombra", "segreto", "sigillo"],
+    "artworkPath": "Cards/lyra_lead.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 2.8 + 40",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_WING_005",
+    "name": "L'Ala",
+    "description": "Aumenta la velocità dell'intero gruppo per 2 turni. Il soprannome che aveva imparato a odiare.",
+    "flavorText": "Da bambina la chiamavano 'l'ala'. Aveva imparato a odiare il soprannome con la metodicità di chi non spreca l'energia dell'odio.",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Vento",
+    "spCost": 2,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 4,
+    "tags": ["buff", "lyra", "vento", "velocità", "gruppo", "ala"],
+    "artworkPath": "Cards/lyra_wing.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "AllAllies",
+        "baseValue": 0,
+        "scalingFormula": "SPD * 0.3",
+        "statusEffect": "Velocizzato",
+        "statusDuration": 2,
+        "statusIntensity": 1.3,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_NEEDLE_006",
+    "name": "Ago e Filo Cerato",
+    "description": "Rimuove uno stato negativo da un alleato e cura lievemente.",
+    "flavorText": "Nella borsa di cuoio consumata: ago e filo cerato, lenti, fiale, due libri. Tutto al proprio posto.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["cleanse", "lyra", "cura", "supporto", "borsa"],
+    "artworkPath": "Cards/lyra_needle.png",
+    "effects": [
+      {
+        "effectType": "Cura",
+        "target": "SingleAlly",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 0.4 + 10",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Stato",
+        "target": "SingleAlly",
+        "statusEffect": "Ancorato",
+        "statusDuration": 1,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_FADINGRUNE_007",
+    "name": "Runa Sbiadita",
+    "description": "Attacco speciale che usa il sesto sigillo quasi spento. Danno elevato, ma rischio di auto-danno.",
+    "flavorText": "La sesta runa era quasi spenta. Non la usare finché non sei pronta. / Non lo sarò mai abbastanza.",
+    "cardType": "Abilita",
+    "cardRarity": "Epica",
+    "elementType": "Vento",
+    "spCost": 5,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 15,
+    "tags": ["sigillo", "lyra", "vento", "sbiadita", "rischio", "custode"],
+    "artworkPath": "Cards/lyra_fadingrune.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 3.5 + 50",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Danno",
+        "target": "Self",
+        "baseValue": 0,
+        "scalingFormula": "HP * 0.15",
+        "statusChance": 0.20
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_LENS_008",
+    "name": "Lente da Ingrandimento",
+    "description": "Analizza il nemico. Per 3 turni il gruppo infligge +15% danno critico.",
+    "flavorText": "Aveva uno strumento in mano — qualcosa di simile a un compasso ma con una lente al posto della punta.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["analisi", "lyra", "critico", "buff", "lente"],
+    "artworkPath": "Cards/lyra_lens.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "AllAllies",
+        "baseValue": 15,
+        "scalingFormula": "",
+        "statusEffect": "Potenziato",
+        "statusDuration": 3,
+        "statusIntensity": 1.15,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_ECONOMY_009",
+    "name": "Economia del Gesto",
+    "description": "Passiva: tutte le carte a costo 3+ costano 1 SP in meno.",
+    "flavorText": "Si muoveva nello spazio con quella deliberatezza economica di chi calcola ogni gesto.",
+    "cardType": "Passiva",
+    "cardRarity": "Rara",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 10,
+    "tags": ["passiva", "lyra", "sp", "economia", "efficienza"],
+    "artworkPath": "Cards/lyra_economy.png",
+    "statSP": 4,
+    "effects": []
+  },
+  {
+    "id": "CARD_LYRA_ATTENTION_010",
+    "name": "Attenzione Pura",
+    "description": "Reazione: 30% di probabilità di negare completamente un attacco nemico.",
+    "flavorText": "Il tipo di sguardo che registra tutto e decide in un secondo cosa vale la pena commentare.",
+    "cardType": "Reazione",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 6,
+    "tags": ["reazione", "lyra", "evasione", "difesa", "attenzione"],
+    "artworkPath": "Cards/lyra_attention.png",
+    "effects": [
+      {
+        "effectType": "Scudo",
+        "target": "Self",
+        "baseValue": 0,
+        "scalingFormula": "DEF * 1.5",
+        "statusChance": 0.30
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_FIVEGUARDIAN_011",
+    "name": "Custode dei Cinque",
+    "description": "Quando tutti e 5 i sigilli attivi sono carichi, esegue un attacco elementale combinato su tutti i nemici.",
+    "flavorText": "Cinque rune di colore scuro quasi nero. Cinque sigilli ancora vivi.",
+    "cardType": "Abilita",
+    "cardRarity": "Epica",
+    "elementType": "Luce",
+    "spCost": 5,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 18,
+    "tags": ["sigillo", "lyra", "luce", "area", "custode", "cinque"],
+    "artworkPath": "Cards/lyra_fiveguardian.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "AllEnemies",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 2.5 + ATK * 0.5 + 60",
+        "hitCount": 1
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_BRAID_012",
+    "name": "Treccia sulla Spalla Sinistra",
+    "description": "Passiva: aumenta l'iniziativa di Lyra. I capelli con molti fili sfuggiti, l'unico aspetto che sfugge al controllo.",
+    "flavorText": "I capelli erano neri, portati in una treccia larga sulla spalla sinistra, con molti fili sfuggiti che le incorniciavano il viso.",
+    "cardType": "Passiva",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["passiva", "lyra", "velocità", "iniziativa"],
+    "artworkPath": "Cards/lyra_braid.png",
+    "statSPD": 9,
+    "effects": []
+  },
+  {
+    "id": "CARD_LYRA_BAG_013",
+    "name": "Borsa di Cuoio Consumata",
+    "description": "Equipaggiamento. Aumenta la capacità del mazzo di 2 slot aggiuntivi.",
+    "flavorText": "La borsa di cuoio pesante, consumata sulle costole, piena di strumenti che solo lei sapeva usare.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["accessorio", "lyra", "mazzo", "borsa", "strumenti"],
+    "artworkPath": "Cards/lyra_bag.png",
+    "statSP": 8,
+    "effects": []
+  },
+  {
+    "id": "CARD_LYRA_CLOAK_014",
+    "name": "Mantello Foderato di Pelo d'Orso",
+    "description": "Armatura leggera con resistenza al Ghiaccio. Pratico prima dell'estetico.",
+    "flavorText": "Un mantello con il cappuccio foderato di pelo d'orso. Abiti pratici — pantaloni di lana grigia, una tunica scura.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Armatura",
+    "cardRarity": "Comune",
+    "elementType": "Ghiaccio",
+    "spCost": 0,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["armatura", "lyra", "ghiaccio", "resistenza", "mantello"],
+    "artworkPath": "Cards/lyra_cloak.png",
+    "statDEF": 8,
+    "statRES": 14,
+    "effects": []
+  },
+  {
+    "id": "CARD_LYRA_BOOK1_015",
+    "name": "Libro dei Sigilli I",
+    "description": "Equipaggiamento. Aumenta MAG. Contiene la formula del Sigillo di Contenimento.",
+    "flavorText": "Due libri rilegati in pelle con le copertine scure di uso.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Arma",
+    "cardRarity": "Insolita",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["arma", "lyra", "sigillo", "libro", "mag"],
+    "artworkPath": "Cards/lyra_book1.png",
+    "statMAG": 16,
+    "effects": []
+  },
+  {
+    "id": "CARD_LYRA_BOOK2_016",
+    "name": "Libro dei Sigilli II",
+    "description": "Equipaggiamento. Aumenta SP max. Contiene la formula della Runa Sbiadita.",
+    "flavorText": "Il secondo libro, più consumato del primo. Alcune pagine erano state riscritte tre volte.",
+    "cardType": "Equipaggiamento",
+    "equipmentSubType": "Accessorio",
+    "cardRarity": "Rara",
+    "elementType": "Neutro",
+    "spCost": 0,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 12,
+    "tags": ["accessorio", "lyra", "sigillo", "libro", "sp", "sbiadita"],
+    "artworkPath": "Cards/lyra_book2.png",
+    "statMAG": 8,
+    "statSP": 12,
+    "effects": []
+  },
+  {
+    "id": "CARD_LYRA_BIRTHMARK_017",
+    "name": "Il Segno",
+    "description": "Il segno sulla guancia sinistra pulsa. Attacco magico Luce con applicazione di Accecato.",
+    "flavorText": "Non una cicatrice ma una macchia di nascita a forma vagamente allungata, che va dal pomello all'angolo della mascella.",
+    "cardType": "Abilita",
+    "cardRarity": "Insolita",
+    "elementType": "Luce",
+    "spCost": 2,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 5,
+    "tags": ["danno", "lyra", "luce", "segno", "accecato"],
+    "artworkPath": "Cards/lyra_birthmark.png",
+    "effects": [
+      {
+        "effectType": "Danno",
+        "target": "SingleEnemy",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 1.6 + 25",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Stato",
+        "target": "SingleEnemy",
+        "statusEffect": "Accecato",
+        "statusDuration": 2,
+        "statusIntensity": 0.6,
+        "statusChance": 0.65
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_NOTEBOOK_018",
+    "name": "Taccuino di Campo",
+    "description": "Registra i dati del nemico. Fornisce un bonus permanente alla prossima carta usata contro quel tipo.",
+    "flavorText": "Registra il risultato sul taccuino. Lyra ha una qualità di chi è completamente presente in quello che sta facendo.",
+    "cardType": "Abilita",
+    "cardRarity": "Comune",
+    "elementType": "Neutro",
+    "spCost": 1,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 0,
+    "tags": ["analisi", "lyra", "taccuino", "dati", "buff"],
+    "artworkPath": "Cards/lyra_notebook.png",
+    "effects": [
+      {
+        "effectType": "Buff",
+        "target": "Self",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 0.25",
+        "statusEffect": "Ispirato",
+        "statusDuration": 2,
+        "statusIntensity": 1.2,
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_BOUNDARY_019",
+    "name": "Il Bordo di Qualcosa",
+    "description": "Crea una barriera attorno al gruppo che assorbe il prossimo danno.",
+    "flavorText": "'Non sai cosa c'è nell'aria di questa radura.' / 'Cosa c'è?' / 'Il bordo di qualcosa.'",
+    "cardType": "Abilita",
+    "cardRarity": "Rara",
+    "elementType": "Neutro",
+    "spCost": 3,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 9,
+    "tags": ["scudo", "lyra", "difesa", "sigillo", "confine"],
+    "artworkPath": "Cards/lyra_boundary.png",
+    "effects": [
+      {
+        "effectType": "Scudo",
+        "target": "AllAllies",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 1.2 + DEF * 0.5 + 30",
+        "statusChance": 1.0
+      }
+    ]
+  },
+  {
+    "id": "CARD_LYRA_RETURN_020",
+    "name": "Ritorno dalla Superficie",
+    "description": "Cura un alleato vicino allo stato KO. Come risalire dall'acqua.",
+    "flavorText": "Il ritorno di Lyra non fu immediato — come guardare qualcuno che risale dall'acqua: prima solo un movimento, poi qualcosa che potrebbe essere respiro.",
+    "cardType": "Abilita",
+    "cardRarity": "Epica",
+    "elementType": "Luce",
+    "spCost": 4,
+    "allowedClasses": ["Custode"],
+    "unlockLevel": 16,
+    "tags": ["cura", "lyra", "luce", "ko", "rinascita", "ancoraggio"],
+    "artworkPath": "Cards/lyra_return.png",
+    "effects": [
+      {
+        "effectType": "Cura",
+        "target": "SingleAlly",
+        "baseValue": 0,
+        "scalingFormula": "MAG * 1.8 + HP * 0.25",
+        "hitCount": 1
+      },
+      {
+        "effectType": "Stato",
+        "target": "SingleAlly",
+        "statusEffect": "Protetto",
+        "statusDuration": 2,
+        "statusIntensity": 1.0,
+        "statusChance": 1.0
+      }
+    ]
+  }
+]
