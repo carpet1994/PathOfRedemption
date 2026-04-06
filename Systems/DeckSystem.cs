@@ -24,6 +24,7 @@
 // =============================================================================
 
 using LaViaDellaRedenzione.Core;
+using LaViaDellaRedenzione.Systems;   // CardDatabase — spostato da Core/CardModel.cs a Systems/CardDatabase.cs
 using System;
 using System.Collections.Generic;
 using System.Linq;
