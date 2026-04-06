@@ -1,0 +1,605 @@
+[
+  {
+    "id": "ENEMY_OMBRA_VUOTA",
+    "name": "Ombra Vuota",
+    "level": 2,
+    "maxHp": 95,
+    "atk": 14,
+    "mag": 6,
+    "def": 8,
+    "res": 7,
+    "spd": 9,
+    "luk": 5,
+    "expReward": 28,
+    "goldReward": 12,
+    "actions": [
+      { "id": "slash", "displayName": "Artigliata Cristallina", "weight": 1, "condition": "always", "effectTags": ["physical", "dark"] },
+      { "id": "lunge", "displayName": "Affondo Vuoto", "weight": 0.6, "condition": "always", "effectTags": ["physical"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 8, "maxCount": 18, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Ombra": 0.85, "Luce": 1.15 },
+    "spriteSheet": "Sprites/Enemies/ombra_vuota",
+    "idleFrames": 4,
+    "attackFrames": 6,
+    "hurtFrames": 3,
+    "deathFrames": 6,
+    "flavorText": "Un tempo era un viandante. L'Oscurità ha svuotato il volto ma ha lasciato il corpo a camminare.",
+    "isBoss": false,
+    "tags": ["oscurita", "umano", "marshen"]
+  },
+  {
+    "id": "ENEMY_SILENZIO_AMBULANTE",
+    "name": "Silenzio Ambulante",
+    "level": 4,
+    "maxHp": 120,
+    "atk": 10,
+    "mag": 18,
+    "def": 9,
+    "res": 14,
+    "spd": 11,
+    "luk": 8,
+    "expReward": 42,
+    "goldReward": 16,
+    "actions": [
+      { "id": "mute_strike", "displayName": "Colpo Senza Suono", "weight": 1, "condition": "always", "effectTags": ["magic", "stun_chance"] },
+      { "id": "void_pulse", "displayName": "Impulso del Silenzio", "weight": 0.7, "condition": "hp_percent < 60", "effectTags": ["magic", "aoe"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 14, "maxCount": 26, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Vento": 0.9, "Ombra": 0.95 },
+    "spriteSheet": "Sprites/Enemies/silenzio_ambulante",
+    "idleFrames": 5,
+    "attackFrames": 7,
+    "hurtFrames": 3,
+    "deathFrames": 7,
+    "flavorText": "Non emette suoni. Il terreno non trema quando passa — solo la pelle dei vivi si irrigidisce.",
+    "isBoss": false,
+    "tags": ["oscurita", "stordimento", "ashgrove"]
+  },
+  {
+    "id": "ENEMY_CRISTALLO_GRANO",
+    "name": "Cristallo di Grano",
+    "level": 6,
+    "maxHp": 160,
+    "atk": 12,
+    "mag": 10,
+    "def": 16,
+    "res": 8,
+    "spd": 6,
+    "luk": 4,
+    "expReward": 55,
+    "goldReward": 20,
+    "actions": [
+      { "id": "spike", "displayName": "Spina di Grano", "weight": 1, "condition": "always", "effectTags": ["physical", "earth"] },
+      { "id": "spore", "displayName": "Polvere Cristallina", "weight": 0.8, "condition": "always", "effectTags": ["debuff", "slow"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 18, "maxCount": 32, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Fuoco": 2.0, "Ghiaccio": 0.75, "Terra": 0.85 },
+    "spriteSheet": "Sprites/Enemies/cristallo_grano",
+    "idleFrames": 4,
+    "attackFrames": 5,
+    "hurtFrames": 3,
+    "deathFrames": 6,
+    "flavorText": "Creatura vegetale nata dove Drevath ha iniziato a consumare il suolo. Il fuoco la fa gemere come legna verde.",
+    "isBoss": false,
+    "tags": ["drevath", "vegetale", "fuoco_weak"]
+  },
+  {
+    "id": "ENEMY_VOCE_GREYPASS",
+    "name": "Voce di Greypass",
+    "level": 8,
+    "maxHp": 200,
+    "atk": 8,
+    "mag": 22,
+    "def": 10,
+    "res": 18,
+    "spd": 12,
+    "luk": 10,
+    "expReward": 68,
+    "goldReward": 24,
+    "actions": [
+      { "id": "echo_name", "displayName": "Chiama un Nome", "weight": 1, "condition": "always", "effectTags": ["magic", "dark", "morale_hit"] },
+      { "id": "wail", "displayName": "Lamento di Battaglia", "weight": 0.9, "condition": "hp_percent < 70", "effectTags": ["magic", "fear"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 22, "maxCount": 40, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Luce": 0.85, "Ombra": 0.9 },
+    "spriteSheet": "Sprites/Enemies/voce_greypass",
+    "idleFrames": 6,
+    "attackFrames": 8,
+    "hurtFrames": 4,
+    "deathFrames": 8,
+    "flavorText": "Spettro che ruba le voci dei caduti. Sussurra nomi che Kael avrebbe voluto dimenticare.",
+    "isBoss": false,
+    "tags": ["greypass", "spettro", "psichico"]
+  },
+  {
+    "id": "ENEMY_GUARDIANO_CONSUMATO",
+    "name": "Guardiano Consumato",
+    "level": 10,
+    "maxHp": 280,
+    "atk": 26,
+    "mag": 8,
+    "def": 22,
+    "res": 12,
+    "spd": 7,
+    "luk": 6,
+    "expReward": 95,
+    "goldReward": 38,
+    "actions": [
+      { "id": "shield_bash", "displayName": "Colpo di Scudo", "weight": 1, "condition": "always", "effectTags": ["physical"] },
+      { "id": "heavy_slash", "displayName": "Fendente Pesante", "weight": 0.7, "condition": "hp_percent < 50", "effectTags": ["physical"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 30, "maxCount": 55, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Terra": 0.9, "Neutro": 1.0 },
+    "spriteSheet": "Sprites/Enemies/guardiano_consumato",
+    "idleFrames": 4,
+    "attackFrames": 7,
+    "hurtFrames": 3,
+    "deathFrames": 7,
+    "flavorText": "Ex soldato imperiale la cui armatura è diventata un guscio nero. Obbedisce ancora a un ordine che nessuno ha dato.",
+    "isBoss": false,
+    "tags": ["soldato", "imperiale", "drevath"]
+  },
+  {
+    "id": "ENEMY_NEBBIA_COSCIENTE",
+    "name": "Nebbia Cosciente",
+    "level": 9,
+    "maxHp": 180,
+    "atk": 6,
+    "mag": 20,
+    "def": 8,
+    "res": 16,
+    "spd": 14,
+    "luk": 12,
+    "expReward": 72,
+    "goldReward": 22,
+    "actions": [
+      { "id": "blind_mist", "displayName": "Nebbia Accecante", "weight": 1, "condition": "always", "effectTags": ["magic", "aoe", "blind"] },
+      { "id": "choke", "displayName": "Soffocamento", "weight": 0.6, "condition": "hp_percent < 55", "effectTags": ["magic", "debuff"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 20, "maxCount": 38, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Ghiaccio": 0.85, "Fuoco": 1.1 },
+    "spriteSheet": "Sprites/Enemies/nebbia_cosciente",
+    "idleFrames": 6,
+    "attackFrames": 6,
+    "hurtFrames": 3,
+    "deathFrames": 7,
+    "flavorText": "Una coscienza diffusa nel vapore. Non colpisce il corpo: ruba la direzione degli occhi.",
+    "isBoss": false,
+    "tags": ["accecamento", "aoe", "oscurita"]
+  },
+  {
+    "id": "ENEMY_ECO_CAMPO",
+    "name": "Eco del Campo",
+    "level": 11,
+    "maxHp": 220,
+    "atk": 16,
+    "mag": 16,
+    "def": 12,
+    "res": 14,
+    "spd": 13,
+    "luk": 14,
+    "expReward": 88,
+    "goldReward": 30,
+    "actions": [
+      { "id": "mirror_last", "displayName": "Riflesso dell'Ultima Carta", "weight": 1, "condition": "always", "effectTags": ["special", "mirror_player"] },
+      { "id": "counter_pulse", "displayName": "Contromossa", "weight": 0.8, "condition": "hp_percent < 65", "effectTags": ["magic"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 26, "maxCount": 48, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Neutro": 0.95, "Ombra": 1.05 },
+    "spriteSheet": "Sprites/Enemies/eco_campo",
+    "idleFrames": 5,
+    "attackFrames": 8,
+    "hurtFrames": 4,
+    "deathFrames": 8,
+    "flavorText": "Memoria ostile del campo di battaglia: ripete l'ultima abilità che ha visto, distorta dall'Oscurità.",
+    "isBoss": false,
+    "tags": ["speciale", "pianure"]
+  },
+  {
+    "id": "ENEMY_RADICE_GRIGIA",
+    "name": "Radice Grigia",
+    "level": 12,
+    "maxHp": 320,
+    "atk": 18,
+    "mag": 12,
+    "def": 18,
+    "res": 14,
+    "spd": 8,
+    "luk": 6,
+    "expReward": 102,
+    "goldReward": 34,
+    "actions": [
+      { "id": "multi_whip", "displayName": "Fruste Radicate", "weight": 1, "condition": "always", "effectTags": ["physical", "multi_hit"] },
+      { "id": "regen", "displayName": "Succhia Humus", "weight": 0.5, "condition": "hp_percent < 45", "effectTags": ["heal_self"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 28, "maxCount": 52, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Terra": 0.8, "Fuoco": 1.25 },
+    "spriteSheet": "Sprites/Enemies/radice_grigia",
+    "idleFrames": 4,
+    "attackFrames": 6,
+    "hurtFrames": 3,
+    "deathFrames": 7,
+    "flavorText": "Difensiva e tenace: le sue radici stringono più forte quando il suolo è morto.",
+    "isBoss": false,
+    "tags": ["vegetale", "rigenerazione", "sette_dita"]
+  },
+  {
+    "id": "ENEMY_STELE_VIVENTE",
+    "name": "Stele Vivente",
+    "level": 14,
+    "maxHp": 420,
+    "atk": 32,
+    "mag": 10,
+    "def": 28,
+    "res": 16,
+    "spd": 4,
+    "luk": 3,
+    "expReward": 130,
+    "goldReward": 44,
+    "actions": [
+      { "id": "stone_slam", "displayName": "Schianto di Pietra", "weight": 1, "condition": "always", "effectTags": ["physical", "earth"] },
+      { "id": "quake", "displayName": "Tremore Lento", "weight": 0.6, "condition": "hp_percent < 60", "effectTags": ["physical", "aoe", "slow"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 36, "maxCount": 62, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Terra": 0.75, "Ghiaccio": 1.1 },
+    "spriteSheet": "Sprites/Enemies/stele_vivente",
+    "idleFrames": 3,
+    "attackFrames": 10,
+    "hurtFrames": 4,
+    "deathFrames": 9,
+    "flavorText": "Un monolite animato dalla paura della foresta. Colpisce raramente, ma quando lo fa, il mondo trema.",
+    "isBoss": false,
+    "tags": ["elite", "terra", "lento"]
+  },
+  {
+    "id": "ENEMY_FALCO_SILENZIO",
+    "name": "Falco del Silenzio",
+    "level": 13,
+    "maxHp": 190,
+    "atk": 24,
+    "mag": 6,
+    "def": 10,
+    "res": 10,
+    "spd": 22,
+    "luk": 16,
+    "expReward": 98,
+    "goldReward": 36,
+    "actions": [
+      { "id": "dive", "displayName": "Picchiata Silenziosa", "weight": 1, "condition": "always", "effectTags": ["physical", "evasion"] },
+      { "id": "talon_poison", "displayName": "Artigli Avvelenati", "weight": 0.85, "condition": "always", "effectTags": ["physical", "poison"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 30, "maxCount": 50, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Vento": 0.85, "Fuoco": 1.15 },
+    "spriteSheet": "Sprites/Enemies/falco_silenzio",
+    "idleFrames": 4,
+    "attackFrames": 5,
+    "hurtFrames": 3,
+    "deathFrames": 6,
+    "flavorText": "Rapido come un pensiero fugace. Schiva i colpi fisici e lascia solo veleno dove passa.",
+    "isBoss": false,
+    "tags": ["veloce", "veleno", "montagna"]
+  },
+  {
+    "id": "ENEMY_CANE_OSCURITA",
+    "name": "Cane dell'Oscurità",
+    "level": 7,
+    "maxHp": 85,
+    "atk": 16,
+    "mag": 4,
+    "def": 6,
+    "res": 6,
+    "spd": 15,
+    "luk": 8,
+    "expReward": 38,
+    "goldReward": 14,
+    "spawnMin": 2,
+    "spawnMax": 3,
+    "actions": [
+      { "id": "bite", "displayName": "Morso", "weight": 1, "condition": "always", "effectTags": ["physical"] },
+      { "id": "pack_howl", "displayName": "Ululato di Branco", "weight": 0.5, "condition": "ally_count > 1", "effectTags": ["buff_pack"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 10, "maxCount": 22, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Ombra": 0.9 },
+    "spriteSheet": "Sprites/Enemies/cane_oscurita",
+    "idleFrames": 4,
+    "attackFrames": 5,
+    "hurtFrames": 2,
+    "deathFrames": 5,
+    "flavorText": "Non caccia da solo. L'Oscurità li manda in coppie o terzetti, come un pensiero che si moltiplica.",
+    "isBoss": false,
+    "tags": ["branco", "bestia", "oscurita"]
+  },
+  {
+    "id": "ENEMY_SPECCHIO_ROTTO",
+    "name": "Specchio Rotto",
+    "level": 15,
+    "maxHp": 240,
+    "atk": 10,
+    "mag": 26,
+    "def": 14,
+    "res": 22,
+    "spd": 10,
+    "luk": 18,
+    "expReward": 118,
+    "goldReward": 42,
+    "actions": [
+      { "id": "reflect_magic", "displayName": "Riflesso Magico", "weight": 1, "condition": "always", "effectTags": ["magic_reflect_50"] },
+      { "id": "shard_storm", "displayName": "Tempesta di Schegge", "weight": 0.7, "condition": "hp_percent < 50", "effectTags": ["magic", "multi_hit"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 32, "maxCount": 58, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Luce": 1.2, "Ombra": 1.1 },
+    "spriteSheet": "Sprites/Enemies/specchio_rotto",
+    "idleFrames": 5,
+    "attackFrames": 7,
+    "hurtFrames": 3,
+    "deathFrames": 8,
+    "flavorText": "Frammenti che ricordano volti sbagliati. Respinge metà della magia come un ricordo che non vuole restare.",
+    "isBoss": false,
+    "tags": ["riflesso", "magia", "elite"]
+  },
+  {
+    "id": "ENEMY_CUSTODE_ABBANDONATO",
+    "name": "Custode Abbandonato",
+    "level": 18,
+    "maxHp": 480,
+    "atk": 14,
+    "mag": 28,
+    "def": 18,
+    "res": 24,
+    "spd": 12,
+    "luk": 12,
+    "expReward": 220,
+    "goldReward": 80,
+    "actions": [
+      { "id": "seal_mock", "displayName": "Contromossa da Custode", "weight": 1, "condition": "always", "effectTags": ["magic", "sigil_like"] },
+      { "id": "bind", "displayName": "Vincolo Spezzato", "weight": 0.8, "condition": "hp_percent < 55", "effectTags": ["magic", "debuff"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 55, "maxCount": 95, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Luce": 0.9, "Ombra": 1.05 },
+    "spriteSheet": "Sprites/Enemies/custode_abbandonato",
+    "idleFrames": 5,
+    "attackFrames": 8,
+    "hurtFrames": 4,
+    "deathFrames": 9,
+    "flavorText": "Mini-boss: un Custode dei Sigilli lasciato senza ordini. Usa mosse che ricordano Lyra, ma in forma corrotta.",
+    "isBoss": true,
+    "tags": ["mini_boss", "sigilli", "lyra_echo"]
+  },
+  {
+    "id": "ENEMY_FANTASMA_VERDHOLM",
+    "name": "Fantasma di Verdholm",
+    "level": 20,
+    "maxHp": 900,
+    "atk": 20,
+    "mag": 32,
+    "def": 16,
+    "res": 26,
+    "spd": 14,
+    "luk": 15,
+    "expReward": 420,
+    "goldReward": 140,
+    "actions": [
+      { "id": "family_echo", "displayName": "Echi di Famiglia", "weight": 1, "condition": "always", "effectTags": ["magic", "psychic", "story"] },
+      { "id": "emptiness", "displayName": "Vuoto del Villaggio", "weight": 0.9, "condition": "hp_percent < 60", "effectTags": ["magic", "aoe"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 90, "maxCount": 160, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Ombra": 0.85, "Luce": 1.1 },
+    "spriteSheet": "Sprites/Enemies/fantasma_verdholm",
+    "idleFrames": 6,
+    "attackFrames": 10,
+    "hurtFrames": 4,
+    "deathFrames": 12,
+    "flavorText": "Boss del Capitolo II: non è una persona — è ciò che resta di Verdholm quando la famiglia di Sera viene nominata.",
+    "isBoss": true,
+    "tags": ["boss", "capitolo_ii", "verdholm"]
+  },
+  {
+    "id": "ENEMY_GENERALE_OSCURO_I",
+    "name": "Generale Oscuro (I forma)",
+    "level": 22,
+    "maxHp": 1100,
+    "atk": 38,
+    "mag": 22,
+    "def": 26,
+    "res": 20,
+    "spd": 16,
+    "luk": 14,
+    "expReward": 480,
+    "goldReward": 180,
+    "actions": [
+      { "id": "dark_card_feint", "displayName": "Assalto da Carta Nemica", "weight": 1, "condition": "always", "effectTags": ["physical", "dark"] },
+      { "id": "command", "displayName": "Ordine Spezzato", "weight": 0.85, "condition": "hp_percent < 70", "effectTags": ["buff_self", "stun"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 100, "maxCount": 180, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Ombra": 0.8, "Luce": 1.15 },
+    "spriteSheet": "Sprites/Enemies/generale_oscuro_1",
+    "idleFrames": 4,
+    "attackFrames": 9,
+    "hurtFrames": 4,
+    "deathFrames": 10,
+    "flavorText": "Mid-boss: un generale piegato dall'Oscurità che simula il sistema di carte contro il gruppo.",
+    "isBoss": true,
+    "tags": ["mid_boss", "carta_simulata"]
+  },
+  {
+    "id": "ENEMY_GENERALE_OSCURO_II",
+    "name": "Generale Oscuro (II forma)",
+    "level": 23,
+    "maxHp": 1400,
+    "atk": 44,
+    "mag": 28,
+    "def": 22,
+    "res": 22,
+    "spd": 18,
+    "luk": 12,
+    "expReward": 620,
+    "goldReward": 220,
+    "actions": [
+      { "id": "transform_slash", "displayName": "Lama della Corruzione", "weight": 1, "condition": "always", "effectTags": ["physical", "dark", "heavy"] },
+      { "id": "double_bar", "displayName": "Furia Doppia", "weight": 1, "condition": "hp_percent < 40", "effectTags": ["rage", "multi_hit"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 120, "maxCount": 200, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Ombra": 0.75, "Fuoco": 1.1 },
+    "spriteSheet": "Sprites/Enemies/generale_oscuro_2",
+    "idleFrames": 5,
+    "attackFrames": 10,
+    "hurtFrames": 4,
+    "deathFrames": 12,
+    "flavorText": "Seconda forma: il corpo si spacca e ricompone — doppia barra HP, doppia crudeltà.",
+    "isBoss": true,
+    "tags": ["mid_boss", "seconda_forma"]
+  },
+  {
+    "id": "ENEMY_SENTINELLA_CENERI",
+    "name": "Sentinella delle Ceneri",
+    "level": 24,
+    "maxHp": 1600,
+    "atk": 36,
+    "mag": 30,
+    "def": 30,
+    "res": 28,
+    "spd": 10,
+    "luk": 10,
+    "expReward": 700,
+    "goldReward": 240,
+    "actions": [
+      { "id": "ash_wave", "displayName": "Ondata di Ceneri", "weight": 1, "condition": "always", "effectTags": ["magic", "fire", "aoe"] },
+      { "id": "ember_shield", "displayName": "Scudo di Brace", "weight": 0.7, "condition": "hp_percent < 50", "effectTags": ["shield", "fire_absorb"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 130, "maxCount": 220, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Fuoco": 0.5, "Ghiaccio": 1.3, "Terra": 1.1 },
+    "spriteSheet": "Sprites/Enemies/sentinella_ceneri",
+    "idleFrames": 5,
+    "attackFrames": 9,
+    "hurtFrames": 4,
+    "deathFrames": 11,
+    "flavorText": "Boss delle Montagne Ceneri: resiste al fuoco come una colpa che non brucia via.",
+    "isBoss": true,
+    "tags": ["boss", "montagne_ceneri", "fuoco"]
+  },
+  {
+    "id": "ENEMY_MANIFESTAZIONE_DUBBIO",
+    "name": "Manifestazione del Dubbio",
+    "level": 26,
+    "maxHp": 1200,
+    "atk": 18,
+    "mag": 36,
+    "def": 14,
+    "res": 30,
+    "spd": 16,
+    "luk": 20,
+    "expReward": 640,
+    "goldReward": 200,
+    "actions": [
+      { "id": "attack_morale", "displayName": "Sussurro a Kael", "weight": 1, "condition": "always", "effectTags": ["psychic", "morale_damage"] },
+      { "id": "whisper_edric", "displayName": "Voce di Greypass", "weight": 0.9, "condition": "hp_percent < 60", "effectTags": ["psychic", "dark"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 110, "maxCount": 190, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Ombra": 0.85, "Luce": 1.2 },
+    "spriteSheet": "Sprites/Enemies/manifestazione_dubbio",
+    "idleFrames": 6,
+    "attackFrames": 8,
+    "hurtFrames": 4,
+    "deathFrames": 10,
+    "flavorText": "Nemico psicologico: non cerca solo gli HP — cerca il Morale di Kael.",
+    "isBoss": true,
+    "tags": ["boss", "psichico", "kael", "morale"]
+  },
+  {
+    "id": "ENEMY_SENZA_NOME",
+    "name": "Il Senza Nome",
+    "level": 28,
+    "maxHp": 2200,
+    "atk": 40,
+    "mag": 40,
+    "def": 26,
+    "res": 26,
+    "spd": 20,
+    "luk": 18,
+    "expReward": 900,
+    "goldReward": 300,
+    "actions": [
+      { "id": "shift_element", "displayName": "Mutare Elemento", "weight": 1, "condition": "always", "effectTags": ["special", "rotate_element"] },
+      { "id": "nameless_strike", "displayName": "Colpo Senza Titolo", "weight": 0.95, "condition": "hp_percent < 75", "effectTags": ["mixed"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 160, "maxCount": 280, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Neutro": 1.0 },
+    "spriteSheet": "Sprites/Enemies/senza_nome",
+    "idleFrames": 6,
+    "attackFrames": 10,
+    "hurtFrames": 4,
+    "deathFrames": 12,
+    "flavorText": "Boss pre-finale: ogni turno muta elemento — l'unica costante è l'assenza di un nome da gridare.",
+    "isBoss": true,
+    "tags": ["boss", "pre_finale", "element_shift"]
+  },
+  {
+    "id": "ENEMY_CUORE_OSCURITA",
+    "name": "Il Cuore dell'Oscurità",
+    "level": 30,
+    "maxHp": 3500,
+    "atk": 48,
+    "mag": 48,
+    "def": 32,
+    "res": 32,
+    "spd": 14,
+    "luk": 22,
+    "expReward": 2000,
+    "goldReward": 500,
+    "actions": [
+      { "id": "phase1_tide", "displayName": "Marea Nera", "weight": 1, "condition": "phase == 1", "effectTags": ["magic", "aoe", "dark"] },
+      { "id": "phase2_sigil_war", "displayName": "Guerra dei Sigilli", "weight": 1, "condition": "phase == 2", "effectTags": ["special", "sigil_corrupt"] },
+      { "id": "phase3_final", "displayName": "Battito Finale", "weight": 1, "condition": "phase == 3", "effectTags": ["ultimate", "multi_hit"] }
+    ],
+    "lootTable": [
+      { "kind": "Gold", "refId": "", "minCount": 200, "maxCount": 400, "dropChance": 1 }
+    ],
+    "elementalResistance": { "Ombra": 0.7, "Luce": 1.25 },
+    "spriteSheet": "Sprites/Enemies/cuore_oscurita",
+    "idleFrames": 8,
+    "attackFrames": 12,
+    "hurtFrames": 5,
+    "deathFrames": 16,
+    "flavorText": "Boss finale in tre fasi: il nucleo dell'Oscurità che consuma Valdrath. La meccanica dei Sigilli di Lyra decide l'esito.",
+    "isBoss": true,
+    "tags": ["boss_finale", "tre_fasi", "sigilli", "lyra"]
+  }
+]
