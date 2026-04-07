@@ -41,7 +41,7 @@
     <ApplicationId>com.refa.valdrath</ApplicationId>
 
     <!-- Target frameworks multi-platform -->
-    <TargetFrameworks>net8.0-android;net8.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
 
     <!-- Versione applicazione — aggiornata da GitHub Actions via VERSION.txt -->
     <ApplicationVersion>1</ApplicationVersion>
