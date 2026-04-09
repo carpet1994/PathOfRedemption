@@ -202,27 +202,37 @@ namespace LaViaDellaRedenzione.Core
         };
 
         /// <summary>
-        /// Chiamato all'inizio di ogni turno del personaggio.
+        /// Chiamato all'inizio di ogni turno del possessore dello stato.
         /// Applica effetti passivi (es. veleno) e decrementa la durata.
         /// Ritorna i danni da applicare (0 se nessuno).
+        ///
+        /// NOTA: owner può essere null quando lo stato appartiene a un nemico
+        /// (EnemyInstance non è un Character). In quel caso gli effetti che
+        /// richiedono il proprietario (Avvelenato, Ispirato) vengono saltati
+        /// e viene decrementata solo la durata.
+        /// Il chiamante (BattleSystem.TickEnemyStatuses) applica il danno veleno
+        /// ai nemici separatamente tramite EnemyInstance.CurrentHP.
         /// </summary>
-        public int OnTurnStart(Character owner)
+        public int OnTurnStart(Character? owner)
         {
             if (!IsActive) return 0;
 
             int damage = 0;
 
-            switch (Type)
+            if (owner != null)
             {
-                case StatusEffectType.Avvelenato:
-                    // Danno = 5% degli HP massimi, arrotondato
-                    damage = (int)Math.Round(owner.MaxHP * 0.05f * Intensity);
-                    break;
+                switch (Type)
+                {
+                    case StatusEffectType.Avvelenato:
+                        // Danno = 5% degli HP massimi, arrotondato
+                        damage = (int)Math.Round(owner.MaxHP * 0.05f * Intensity);
+                        break;
 
-                case StatusEffectType.Ispirato:
-                    // Rigenera 1 SP per turno
-                    owner.RestoreSP(1);
-                    break;
+                    case StatusEffectType.Ispirato:
+                        // Rigenera 1 SP per turno
+                        owner.RestoreSP(1);
+                        break;
+                }
             }
 
             Duration--;
