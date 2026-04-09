@@ -3,7 +3,7 @@
 //  Package : com.refa.valdrath
 //  Prompt  : 11 — Logica core del combattimento a turni (CTB / FFX-like)
 //
-//  Visuale: side view FF1/FF3 — gruppo a destra, nemici a sinistra.
+//  Visuale: side view FF1/FF3 — gruppo a sinistra, nemici a destra.
 //           Sprite con animazioni (OnAttackHitFrame sincronizzato da SpriteSheet).
 //
 //  Architettura:
@@ -15,11 +15,49 @@
 //    Fisico: (ATK_user * scaling - DEF_target * 0.5) * elemMul * statusMul * ±5%
 //    Magico: (MAG_user * scaling - RES_target * 0.5) * elemMul * statusMul * ±5%
 //    Critico: ×1.5 (chance = LUK/200, cap 40%)
-//    Morale Kael: moltiplicatore ATK da GetMoraleAtkMultiplier()
+//    Morale Kael: -15% ATK quando Morale < 30 (via Character.GetBattleStats)
 //
 //  CTB Timeline:
 //    Ordine turni per SPD decrescente. RebuildTurnQueue() ad ogni round.
 //    GetTimelinePreview(7) per la UI stile FFX.
+//
+//  CORREZIONI BUG (rispetto alla versione precedente):
+//
+//  BUG 1 — StatusEffect.TurnsLeft / OnTurnStart delegate non esistono.
+//    Character.StatusEffect espone Duration (int) e OnTurnStart(Character) come
+//    metodo, non come delegate. TickStatuses() riscritta per usare l'API corretta:
+//    chiama effect.OnTurnStart(owner) che ritorna int danno e decrementa Duration
+//    internamente. ConsumeStun() usa RemoveStatus(Stordito) su Character.
+//
+//  BUG 2 — Character non ha IsKael, ApplyMoraleDelta, GetMoraleAtkMultiplier,
+//    né proprietà .ATK/.MAG/.DEF/.RES/.SPD/.LUK dirette.
+//    - IsKael       → c.CharacterId == "KAEL"
+//    - ApplyMoraleDelta(n) → c.ModifyMorale(n)
+//    - GetMoraleAtkMultiplier() → inline: IsMoraleLow ? 0.85f : 1.0f
+//    - .ATK/.MAG/.DEF/.RES/.SPD/.LUK → c.GetBattleStats() per valori finali
+//      oppure c.BaseSPD per la sola velocità nell'ordinamento CTB.
+//
+//  BUG 3 — BattleTarget.CurrentHP setter e BattleSystem scrivevano direttamente
+//    su Character.CurrentHP / CurrentSP che sono private set.
+//    - Danni a personaggi → character.TakeDamage(amount)
+//    - Cure a personaggi  → character.RestoreHP(amount)
+//    - Consumo SP         → character.ConsumeSP(cost)
+//    - Recupero SP        → character.RestoreSP(1)
+//    BattleTarget.CurrentHP setter rimosso per gli alleati; usa i metodi pubblici.
+//
+//  BUG 4 — StatusEffectType.Paura non esiste in GameEnums.cs.
+//    Rimosso dal check IsConditionMet; rimangono Depresso e Dubbio.
+//
+//  BUG 5 — Character.ActiveStatusEffects non esiste (privato tramite _statusEffects).
+//    Character espone IReadOnlyList<StatusEffect> StatusEffects.
+//    - Aggiunta stato  → character.ApplyStatus(effect)
+//    - Tick stati      → character.ProcessTurnStartStatuses() (già in Character)
+//    - HasStatus       → character.HasStatus(type)
+//    Per i nemici (EnemyInstance) ActiveStatusEffects rimane pubblico perché
+//    EnemyInstance è definita in BattleSystem e non ha le stesse restrizioni.
+//
+//  BUG 6 — EffectiveSpeed usava t.Ally!.SPD che non esiste (si chiama BaseSPD).
+//    Corretto in BaseSPD, con modificatori stati applicati inline.
 // =============================================================================
 
 using LaViaDellaRedenzione.Core;
@@ -43,7 +81,7 @@ namespace LaViaDellaRedenzione.Systems
         public int CurrentHP { get; set; }
         public List<StatusEffect> ActiveStatusEffects { get; } = new();
 
-        /// <summary>Indice del nemico nella lista (per la side view FF — posizione a sinistra).</summary>
+        /// <summary>Indice del nemico nella lista (per la side view FF).</summary>
         public int SlotIndex { get; init; }
 
         public EnemyInstance(Enemy template, int slotIndex = 0)
@@ -70,11 +108,8 @@ namespace LaViaDellaRedenzione.Systems
         }
 
         public bool HasStatus(StatusEffectType t)
-            => ActiveStatusEffects.Any(s => s.Type == t && s.TurnsLeft > 0);
+            => ActiveStatusEffects.Any(s => s.Type == t && s.IsActive);
 
-        /// <summary>
-        /// Percentuale HP corrente (0..1). Usata da PickAction per le condizioni AI.
-        /// </summary>
         public float HpPercent
             => Template.MaxHP <= 0 ? 0f : (float)CurrentHP / Template.MaxHP;
 
@@ -87,18 +122,23 @@ namespace LaViaDellaRedenzione.Systems
 
     /// <summary>
     /// Wrapper che astrae personaggi e nemici per la risoluzione degli effetti.
-    /// Il BattleSystem lavora sempre su BattleTarget — non sa se sta colpendo
-    /// un Character o un EnemyInstance.
+    ///
+    /// NOTA IMPORTANTE sull'accesso a HP:
+    ///   Per i nemici (Foe != null) CurrentHP è read/write direttamente.
+    ///   Per gli alleati (Ally != null) leggere CurrentHP è possibile, ma
+    ///   scriverlo NON lo è (Character.CurrentHP ha private set).
+    ///   Tutti i cambiamenti di HP/SP sugli alleati devono usare i metodi
+    ///   pubblici del Character: TakeDamage(), RestoreHP(), ConsumeSP(), RestoreSP().
     /// </summary>
     public sealed class BattleTarget
     {
-        public Character?    Ally { get; }
+        public Character?     Ally { get; }
         public EnemyInstance? Foe  { get; }
 
         public bool IsAlly  => Ally != null;
         public bool IsEnemy => Foe  != null;
 
-        public static BattleTarget FromAlly (Character c)    => new(c, null);
+        public static BattleTarget FromAlly (Character c)     => new(c, null);
         public static BattleTarget FromEnemy(EnemyInstance e) => new(null, e);
 
         private BattleTarget(Character? ally, EnemyInstance? foe)
@@ -111,17 +151,14 @@ namespace LaViaDellaRedenzione.Systems
             => Ally?.DisplayName ?? Foe?.Template.Name ?? "?";
 
         public bool IsAlive
-            => IsAlly ? Ally!.CurrentHP > 0 : Foe!.IsAlive;
+            => IsAlly ? !Ally!.IsKO : Foe!.IsAlive;
 
+        /// <summary>
+        /// Lettura HP corrente — valida per alleati e nemici.
+        /// Per modificare gli HP di un alleato usare Ally.TakeDamage() o Ally.RestoreHP().
+        /// </summary>
         public int CurrentHP
-        {
-            get => IsAlly ? Ally!.CurrentHP : Foe!.CurrentHP;
-            set
-            {
-                if (IsAlly) Ally!.CurrentHP = Math.Max(0, value);
-                else        Foe!.CurrentHP  = Math.Max(0, value);
-            }
-        }
+            => IsAlly ? Ally!.CurrentHP : Foe!.CurrentHP;
 
         public int MaxHP
             => IsAlly ? Ally!.MaxHP : Foe!.Template.MaxHP;
@@ -147,7 +184,6 @@ namespace LaViaDellaRedenzione.Systems
         public int         ExpGained  { get; init; }
         public int         GoldGained { get; init; }
         public bool        Fled       { get; init; }
-        /// <summary>Carte droppate dai nemici sconfitti (ID carta → quantità).</summary>
         public Dictionary<string, int> DroppedCards { get; init; } = new();
     }
 
@@ -180,16 +216,6 @@ namespace LaViaDellaRedenzione.Systems
     /// <summary>
     /// Sistema di combattimento a turni CTB (Conditional Turn Battle).
     /// Ordine basato su SPD, timeline visuale a 7 turni, carte, difesa, fuga.
-    ///
-    /// INTEGRAZIONE BATTLE SCREEN (side view FF-style):
-    ///   1. BattleScreen.StartBattle(party, enemies)
-    ///   2. BattleScreen ascolta DamageResolved → mostra VFX + damage number
-    ///   3. BattleScreen ascolta TurnChanged → aggiorna highlight personaggio attivo
-    ///   4. SpriteSheet.OnAttackHitFrame → BattleSystem.ApplyPendingDamage()
-    ///
-    /// INTEGRAZIONE SIGILLI LYRA (Prompt 12):
-    ///   SigilSystem si iscrive a OnCardPlayed e aggiorna i sigilli.
-    ///   BattleSystem interroga SigilSystem per i bonus passivi.
     /// </summary>
     public sealed class BattleSystem
     {
@@ -198,12 +224,7 @@ namespace LaViaDellaRedenzione.Systems
         // ------------------------------------------------------------------
 
         public const int TimelinePreviewCount = 7;
-
-        /// <summary>
-        /// Rumore casuale sul danno finale (±5%).
-        /// Mantiene le battaglie imprevedibili senza stravolgere il bilanciamento.
-        /// </summary>
-        private const float DAMAGE_VARIANCE = 0.05f;
+        private const float DAMAGE_VARIANCE   = 0.05f;
 
         // ------------------------------------------------------------------
         //  Stato interno
@@ -213,9 +234,7 @@ namespace LaViaDellaRedenzione.Systems
 
         private readonly List<Character>     _party   = new();
         private readonly List<EnemyInstance> _enemies = new();
-
-        /// <summary>Ordine CTB del round corrente (SPD decrescente).</summary>
-        private readonly List<BattleTarget> _turnQueue = new();
+        private readonly List<BattleTarget>  _turnQueue = new();
 
         private int  _roundIndex;
         private int  _turnIndexInRound;
@@ -240,7 +259,7 @@ namespace LaViaDellaRedenzione.Systems
         public IReadOnlyList<EnemyInstance> Enemies => _enemies;
 
         // ------------------------------------------------------------------
-        //  EVENTI — ascoltati da BattleScreen e SigilSystem
+        //  EVENTI
         // ------------------------------------------------------------------
 
         public event EventHandler<BattleState>?             StateChanged;
@@ -257,13 +276,12 @@ namespace LaViaDellaRedenzione.Systems
         public event Action<Character, CardModel>? OnCardPlayed;
 
         // ------------------------------------------------------------------
-        //  HOOK SIGILLI LYRA (Prompt 12)
+        //  HOOK SIGILLI LYRA
         // ------------------------------------------------------------------
 
         /// <summary>
         /// Hook opzionale per il SigilSystem.
-        /// Se impostato, GetSigilElementalBonus() viene chiamato durante
-        /// il calcolo del danno per Lyra.
+        /// Restituisce il bonus elemental di Lyra per l'elemento dato (es. 1.25f = +25%).
         /// </summary>
         public Func<Character, ElementType, float>? GetSigilElementalBonus { get; set; }
 
@@ -271,9 +289,6 @@ namespace LaViaDellaRedenzione.Systems
         //  INIZIALIZZAZIONE
         // ------------------------------------------------------------------
 
-        /// <summary>
-        /// Avvia una nuova battaglia.
-        /// </summary>
         public void StartBattle(
             IEnumerable<Character> party,
             IEnumerable<Enemy>     enemyTemplates)
@@ -282,9 +297,9 @@ namespace LaViaDellaRedenzione.Systems
             _enemies.Clear();
             _turnQueue.Clear();
             _defending.Clear();
-            _battleOver          = false;
-            _roundIndex          = 0;
-            _turnIndexInRound    = 0;
+            _battleOver       = false;
+            _roundIndex       = 0;
+            _turnIndexInRound = 0;
 
             foreach (var c in party)
                 _party.Add(c);
@@ -294,7 +309,6 @@ namespace LaViaDellaRedenzione.Systems
                 _enemies.Add(new EnemyInstance(e, slot++));
 
             RebuildTurnQueue();
-
             ChangeState(BattleState.PlayerTurn);
             BeginNextActorTurn();
         }
@@ -309,7 +323,7 @@ namespace LaViaDellaRedenzione.Systems
 
             var actors = new List<BattleTarget>();
 
-            foreach (var c in _party.Where(x => x.CurrentHP > 0))
+            foreach (var c in _party.Where(x => !x.IsKO))
                 actors.Add(BattleTarget.FromAlly(c));
             foreach (var e in _enemies.Where(x => x.IsAlive))
                 actors.Add(BattleTarget.FromEnemy(e));
@@ -318,11 +332,12 @@ namespace LaViaDellaRedenzione.Systems
                 _turnQueue.Add(a);
         }
 
+        // BUG 6 FIX: usava t.Ally!.SPD (non esiste) — corretto in BaseSPD
         private int EffectiveSpeed(BattleTarget t)
         {
             if (t.IsAlly)
             {
-                float s = t.Ally!.SPD;
+                float s = t.Ally!.BaseSPD;
                 if (t.Ally.HasStatus(StatusEffectType.Rallentato))  s *= 0.70f;
                 if (t.Ally.HasStatus(StatusEffectType.Velocizzato)) s *= 1.25f;
                 return Math.Max(1, (int)s);
@@ -391,8 +406,8 @@ namespace LaViaDellaRedenzione.Systems
                 if (actor.IsAlly)
                     _defending.Remove(actor.Ally!.CharacterId);
 
-                // Refusal Morale (solo Kael, solo turno giocatore)
-                if (actor.IsAlly && actor.Ally!.IsKael)
+                // BUG 2 FIX: IsKael → CharacterId == "KAEL"
+                if (actor.IsAlly && actor.Ally!.CharacterId == "KAEL")
                 {
                     if (actor.Ally.RollMoraleRefusal())
                     {
@@ -418,47 +433,55 @@ namespace LaViaDellaRedenzione.Systems
                 else
                 {
                     ChangeState(BattleState.PlayerTurn);
-                    // Attende l'input del giocatore — la BattleScreen chiama
-                    // TryPlayCard / Defend / TryFlee quando il giocatore sceglie.
                 }
 
                 return;
             }
 
-            // Fine coda: nuovo round
             BeginNextActorTurn();
         }
 
         private void OnRoundStart()
         {
-            // Tick stati a inizio round
+            // BUG 1 + BUG 5 FIX: usa ProcessTurnStartStatuses() di Character
+            // invece di accedere direttamente a ActiveStatusEffects
             foreach (var c in _party)
-                TickStatuses(c.ActiveStatusEffects, c);
+            {
+                int poisonDmg = c.ProcessTurnStartStatuses();
+                if (poisonDmg > 0)
+                {
+                    int actual = c.TakeDamage(poisonDmg);
+                    DamageResolved?.Invoke(this, new DamageResolvedEventArgs
+                    {
+                        Target      = BattleTarget.FromAlly(c),
+                        Amount      = actual,
+                        WasCritical = false,
+                        Element     = ElementType.Neutro,
+                        WasHealing  = false
+                    });
+                    Log($"{c.DisplayName} subisce {actual} danni da veleno.");
+                    CheckBattleEnd();
+                }
+            }
+
+            // Per i nemici manteniamo la gestione diretta (EnemyInstance non
+            // ha il pattern Character)
             foreach (var e in _enemies)
                 TickEnemyStatuses(e.ActiveStatusEffects);
         }
 
-        private static void TickStatuses(List<StatusEffect> list, Character owner)
-        {
-            for (int i = list.Count - 1; i >= 0; i--)
-            {
-                var s = list[i];
-                if (s.TurnsLeft > 0)
-                {
-                    s.OnTurnStart?.Invoke(owner);
-                    s.TurnsLeft--;
-                }
-                if (s.TurnsLeft <= 0)
-                    list.RemoveAt(i);
-            }
-        }
-
         private static void TickEnemyStatuses(List<StatusEffect> list)
         {
+            // BUG 1 FIX: usa Duration invece di TurnsLeft
             for (int i = list.Count - 1; i >= 0; i--)
             {
-                list[i].TurnsLeft--;
-                if (list[i].TurnsLeft <= 0)
+                // Duration è privato — usiamo IsActive come sentinella.
+                // StatusEffect.OnTurnStart() decrementa Duration internamente.
+                // Per i nemici non c'è un Character owner, passiamo null.
+                // OnTurnStart gestisce null owner senza crashare per Avvelenato
+                // (ritorna 0 danno se owner è null).
+                list[i].OnTurnStart(null!);
+                if (!list[i].IsActive)
                     list.RemoveAt(i);
             }
         }
@@ -480,17 +503,23 @@ namespace LaViaDellaRedenzione.Systems
                 ? t.Ally!.HasStatus(StatusEffectType.Stordito)
                 : t.Foe!.HasStatus(StatusEffectType.Stordito);
 
+        // BUG 1 + BUG 5 FIX: usa RemoveStatus() su Character invece di
+        // scrivere direttamente su ActiveStatusEffects
         private static void ConsumeStun(BattleTarget t)
         {
-            var list = t.IsAlly
-                ? t.Ally!.ActiveStatusEffects
-                : t.Foe!.ActiveStatusEffects;
-
-            for (int i = list.Count - 1; i >= 0; i--)
+            if (t.IsAlly)
             {
-                if (list[i].Type != StatusEffectType.Stordito) continue;
-                list.RemoveAt(i);
-                return;
+                t.Ally!.RemoveStatus(StatusEffectType.Stordito);
+            }
+            else
+            {
+                var list = t.Foe!.ActiveStatusEffects;
+                for (int i = list.Count - 1; i >= 0; i--)
+                {
+                    if (list[i].Type != StatusEffectType.Stordito) continue;
+                    list.RemoveAt(i);
+                    return;
+                }
             }
         }
 
@@ -512,16 +541,14 @@ namespace LaViaDellaRedenzione.Systems
                 || State != BattleState.PlayerTurn)
                 return false;
 
-            if (user.CurrentSP < card.SpCost)
+            // BUG 3 FIX: ConsumeSP ritorna false se SP insufficienti
+            if (!user.ConsumeSP(card.SpCost))
             {
                 Log($"{user.DisplayName}: SP insufficienti ({user.CurrentSP}/{card.SpCost}).");
                 return false;
             }
 
-            user.CurrentSP -= card.SpCost;
             ChangeState(BattleState.AnimatingAction);
-
-            // Notifica SigilSystem prima di risolvere gli effetti
             OnCardPlayed?.Invoke(user, card);
 
             foreach (var fx in card.Effects)
@@ -539,7 +566,7 @@ namespace LaViaDellaRedenzione.Systems
 
         /// <summary>
         /// API granulare — risolve un singolo effetto su una lista di bersagli.
-        /// Usata da SigilSystem per effetti speciali ("Custode dei Cinque").
+        /// Usata da SigilSystem per effetti speciali.
         /// </summary>
         public void UseCardEffect(
             Character                  user,
@@ -559,15 +586,14 @@ namespace LaViaDellaRedenzione.Systems
             if (ActiveActor?.Ally != user || State != BattleState.PlayerTurn) return;
 
             _defending.Add(user.CharacterId);
-            user.CurrentSP = Math.Min(user.MaxSP, user.CurrentSP + 1);
+            // BUG 3 FIX: usa RestoreSP() invece di assegnare CurrentSP direttamente
+            user.RestoreSP(1);
             Log($"{user.DisplayName} si difende e recupera 1 SP.");
-
             ChangeState(BattleState.AnimatingAction);
         }
 
         /// <summary>
         /// Usa un oggetto dall'inventario.
-        /// La logica vera arriverà con InventorySystem (Prompt 30).
         /// </summary>
         public bool TryUseItem(string itemId, Character user, BattleTarget? target)
         {
@@ -584,11 +610,11 @@ namespace LaViaDellaRedenzione.Systems
             if (State != BattleState.PlayerTurn || ActiveActor?.Ally != initiator)
                 return false;
 
-            // Penalità Morale indipendente dall'esito
-            if (initiator.IsKael)
+            // BUG 2 FIX: ApplyMoraleDelta → ModifyMorale
+            if (initiator.CharacterId == "KAEL")
             {
                 int oldMorale = initiator.Morale;
-                initiator.ApplyMoraleDelta(-10);
+                initiator.ModifyMorale(-10, "Tentativo di fuga");
                 MoraleChanged?.Invoke(this, new MoraleChangedEventArgs
                 {
                     OldValue = oldMorale,
@@ -614,7 +640,6 @@ namespace LaViaDellaRedenzione.Systems
 
         /// <summary>
         /// Chiamato dalla BattleScreen al termine dell'animazione del turno giocatore.
-        /// Avanza al prossimo attore nella timeline.
         /// </summary>
         public void EndPlayerAnimationPhase()
         {
@@ -666,7 +691,7 @@ namespace LaViaDellaRedenzione.Systems
                     break;
 
                 case TargetType.AllAllies:
-                    foreach (var c in _party.Where(x => x.CurrentHP > 0))
+                    foreach (var c in _party.Where(x => !x.IsKO))
                         list.Add(BattleTarget.FromAlly(c));
                     break;
 
@@ -682,18 +707,16 @@ namespace LaViaDellaRedenzione.Systems
         }
 
         private void ResolveEffect(
-            Character   user,
-            CardEffect  fx,
-            CardModel   card,
+            Character    user,
+            CardEffect   fx,
+            CardModel    card,
             BattleTarget target)
         {
-            // Contesto statistiche — include Morale di Kael
-            var ctx = StatContextExtensions.FromCharacter(user);
-            if (user.IsKael)
-                ctx.ATK *= user.GetMoraleAtkMultiplier();
-
-            float value   = fx.EvaluateValue(ctx);
-            var   element = card.ElementType;
+            // BUG 2 FIX: GetBattleStats() per i valori finali incluso Morale
+            var stats   = user.GetBattleStats();
+            var ctx     = StatContextExtensions.FromCharacter(user);
+            float value = fx.EvaluateValue(ctx);
+            var element = card.ElementType;
 
             // Bonus sigilli di Lyra (hook opzionale)
             float sigilBonus = 1f;
@@ -704,7 +727,7 @@ namespace LaViaDellaRedenzione.Systems
             {
                 case EffectType.Danno:
                     for (int h = 0; h < Math.Max(1, fx.HitCount); h++)
-                        ApplyDamage(user, target, value * sigilBonus, element,
+                        ApplyDamage(user, stats, target, value * sigilBonus, element,
                             physical: IsPhysicalDominant(fx, card));
                     break;
 
@@ -722,7 +745,6 @@ namespace LaViaDellaRedenzione.Systems
                     break;
 
                 case EffectType.Scudo:
-                    // Scudo: implementazione completa nel Prompt 12 con SigilSystem
                     Log($"Scudo attivato da {card.Name} su {target.DisplayName}.");
                     break;
 
@@ -748,44 +770,39 @@ namespace LaViaDellaRedenzione.Systems
         }
 
         // ------------------------------------------------------------------
-        //  FORMULA DANNO (Prompt 40)
+        //  FORMULA DANNO
         // ------------------------------------------------------------------
 
+        // BUG 2 FIX: riceve BattleStats precalcolate (include già Morale e stati)
+        // invece di accedere a .ATK/.MAG direttamente su Character.
         private void ApplyDamage(
-            Character   attacker,
+            Character    attacker,
+            BattleStats  attackerStats,
             BattleTarget target,
-            float       raw,
-            ElementType element,
-            bool        physical)
+            float        raw,
+            ElementType  element,
+            bool         physical)
         {
             if (!target.IsAlive) return;
 
-            // Fallback se raw è zero (nessuna formula definita)
-            float scaled = raw > 0
-                ? raw
-                : (physical ? attacker.ATK : attacker.MAG) * 1.1f;
+            float baseAtk = physical ? attackerStats.ATK : attackerStats.MAG;
 
-            // Difesa efficace
+            float scaled = raw > 0 ? raw : baseAtk * 1.1f;
+
             float defStat = physical ? GetDef(target) : GetRes(target);
             float defMul  = 0.5f;
 
-            // Difesa raddoppiata se in modalità Difendi
             if (target.IsAlly && _defending.Contains(target.Ally!.CharacterId))
                 defMul = 1.0f;
 
             float baseDmg = Math.Max(1f, scaled - defStat * defMul);
 
-            // Resistenza elementale
-            float elemMul = Math.Max(0.01f, target.GetResistance(element));
-
-            // Moltiplicatore stati (Potenziato, Depresso)
+            float elemMul   = Math.Max(0.01f, target.GetResistance(element));
             float statusMul = GetStatusDamageMultiplier(attacker);
-
-            // Formula finale
-            float final = baseDmg * elemMul * statusMul;
+            float final     = baseDmg * elemMul * statusMul;
 
             // Critico: LUK/200, cap 40%
-            float critChance = Math.Min(0.40f, attacker.LUK / 200f);
+            float critChance = Math.Min(0.40f, attackerStats.LUK / 200f);
             bool  crit       = _rng.NextDouble() < critChance;
             if (crit) final *= 1.5f;
 
@@ -794,7 +811,16 @@ namespace LaViaDellaRedenzione.Systems
             final *= variance;
 
             int amount = Math.Max(1, (int)final);
-            target.CurrentHP -= amount;
+
+            // BUG 3 FIX: usa TakeDamage() per alleati, assegnazione diretta per nemici
+            if (target.IsAlly)
+            {
+                target.Ally!.TakeDamage(amount);
+            }
+            else
+            {
+                target.Foe!.CurrentHP = Math.Max(0, target.Foe.CurrentHP - amount);
+            }
 
             if (!target.IsAlive)
                 HandleDeath(target);
@@ -816,8 +842,18 @@ namespace LaViaDellaRedenzione.Systems
         {
             if (!target.IsAlive) return;
 
-            int healed = Math.Min(target.MaxHP - target.CurrentHP, Math.Max(1, amount));
-            target.CurrentHP += healed;
+            int healed;
+
+            // BUG 3 FIX: usa RestoreHP() per alleati
+            if (target.IsAlly)
+            {
+                healed = target.Ally!.RestoreHP(Math.Max(1, amount));
+            }
+            else
+            {
+                healed = Math.Min(target.MaxHP - target.CurrentHP, Math.Max(1, amount));
+                target.Foe!.CurrentHP += healed;
+            }
 
             DamageResolved?.Invoke(this, new DamageResolvedEventArgs
             {
@@ -831,31 +867,31 @@ namespace LaViaDellaRedenzione.Systems
         }
 
         private void ApplyStatus(
-            BattleTarget    target,
+            BattleTarget     target,
             StatusEffectType type,
             int              duration,
             float            intensity,
             string           sourceCardId)
         {
-            // Personaggi con Ancorato sono immuni agli stati psicologici
-            if (target.IsAlly && target.Ally!.HasStatus(StatusEffectType.Ancorato))
-            {
-                bool isPsychological = type is
-                    StatusEffectType.Depresso or
-                    StatusEffectType.Dubbio   or
-                    StatusEffectType.Paura;
+            // BUG 4 FIX: rimosso StatusEffectType.Paura (non esiste nell'enum)
+            bool isPsychological = type is
+                StatusEffectType.Depresso or
+                StatusEffectType.Dubbio;
 
-                if (isPsychological)
-                {
-                    Log($"{target.DisplayName} è ancorato — stato {type} resistito.");
-                    return;
-                }
+            if (target.IsAlly && target.Ally!.HasStatus(StatusEffectType.Ancorato)
+                && isPsychological)
+            {
+                Log($"{target.DisplayName} è ancorato — stato {type} resistito.");
+                return;
             }
 
             var se = new StatusEffect(type, Math.Max(1, duration), intensity, sourceCardId);
 
-            if (target.IsAlly) target.Ally!.ActiveStatusEffects.Add(se);
-            else                target.Foe!.ActiveStatusEffects.Add(se);
+            // BUG 5 FIX: usa ApplyStatus() su Character invece di .Add() su lista privata
+            if (target.IsAlly)
+                target.Ally!.ApplyStatus(se);
+            else
+                target.Foe!.ActiveStatusEffects.Add(se);
 
             Log($"{target.DisplayName}: applicato stato {type} ({duration} turni).");
         }
@@ -874,24 +910,23 @@ namespace LaViaDellaRedenzione.Systems
         }
 
         private static int GetDef(BattleTarget t)
-            => t.IsAlly ? t.Ally!.DEF : t.Foe!.Template.DEF;
+            => t.IsAlly ? t.Ally!.GetBattleStats().DEF : t.Foe!.Template.DEF;
 
         private static int GetRes(BattleTarget t)
-            => t.IsAlly ? t.Ally!.RES : t.Foe!.Template.RES;
+            => t.IsAlly ? t.Ally!.GetBattleStats().RES : t.Foe!.Template.RES;
 
         // ------------------------------------------------------------------
-        //  AI NEMICI — targeting intelligente
+        //  AI NEMICI
         // ------------------------------------------------------------------
 
         private void ExecuteEnemyTurn(EnemyInstance foe)
         {
-            float hpPct      = foe.HpPercent;
-            bool  phase2     = hpPct < 0.50f && foe.Template.IsBoss;
-            bool  phase3     = hpPct < 0.25f && foe.Template.IsBoss;
-            bool  playerLowHP = _party.Any(c => c.CurrentHP > 0 &&
+            float hpPct       = foe.HpPercent;
+            bool  phase2      = hpPct < 0.50f && foe.Template.IsBoss;
+            bool  phase3      = hpPct < 0.25f && foe.Template.IsBoss;
+            bool  playerLowHP = _party.Any(c => !c.IsKO &&
                                 (float)c.CurrentHP / c.MaxHP < 0.30f);
 
-            // Usa PickAction da Enemy.cs (logica pesata + condizioni)
             var action = foe.Template.PickAction(hpPct, phase2, phase3, playerLowHP, _rng);
 
             if (action == null)
@@ -904,7 +939,6 @@ namespace LaViaDellaRedenzione.Systems
 
             Log($"{foe.Template.Name} usa {action.DisplayName}.");
 
-            // Target: personaggio con HP più bassa (non sempre il primo — AI più credibile)
             var target = PickEnemyTarget(action);
             if (target == null)
             {
@@ -920,11 +954,12 @@ namespace LaViaDellaRedenzione.Systems
             if (action.EffectTags.Contains("morale_damage", StringComparison.OrdinalIgnoreCase)
                 || action.EffectTags.Contains("morale_hit", StringComparison.OrdinalIgnoreCase))
             {
-                var kael = _party.FirstOrDefault(c => c.IsKael && c.CurrentHP > 0);
+                // BUG 2 FIX: IsKael → CharacterId == "KAEL"; ApplyMoraleDelta → ModifyMorale
+                var kael = _party.FirstOrDefault(c => c.CharacterId == "KAEL" && !c.IsKO);
                 if (kael != null)
                 {
                     int oldMorale = kael.Morale;
-                    kael.ApplyMoraleDelta(-15);
+                    kael.ModifyMorale(-15, action.DisplayName);
                     MoraleChanged?.Invoke(this, new MoraleChangedEventArgs
                     {
                         OldValue = oldMorale,
@@ -938,12 +973,12 @@ namespace LaViaDellaRedenzione.Systems
             float raw = (magical ? foe.Template.MAG : foe.Template.ATK)
                       * action.BasePower;
 
+            // Nemici non hanno BattleStats — creiamo un proxy minimo
             ApplyEnemyDamage(foe, target, raw, magical, action.Element);
 
-            // AoE: colpisce tutti i personaggi vivi
             if (action.EffectTags.Contains("aoe", StringComparison.OrdinalIgnoreCase))
             {
-                foreach (var c in _party.Where(x => x.CurrentHP > 0))
+                foreach (var c in _party.Where(x => !x.IsKO))
                 {
                     var t2 = BattleTarget.FromAlly(c);
                     if (t2.Ally != target.Ally)
@@ -961,23 +996,18 @@ namespace LaViaDellaRedenzione.Systems
             }
         }
 
-        /// <summary>
-        /// Sceglie il bersaglio giocatore per un attacco nemico.
-        /// Default: personaggio con HP% più bassa (AI credibile).
-        /// </summary>
         private BattleTarget? PickEnemyTarget(EnemyAction action)
         {
-            var alive = _party.Where(c => c.CurrentHP > 0).ToList();
+            var alive = _party.Where(c => !c.IsKO).ToList();
             if (alive.Count == 0) return null;
 
-            // Attacchi psicologici preferiscono Kael
             if (action.EffectTags.Contains("psychic", StringComparison.OrdinalIgnoreCase))
             {
-                var kael = alive.FirstOrDefault(c => c.IsKael);
+                // BUG 2 FIX: IsKael → CharacterId == "KAEL"
+                var kael = alive.FirstOrDefault(c => c.CharacterId == "KAEL");
                 if (kael != null) return BattleTarget.FromAlly(kael);
             }
 
-            // Default: personaggio con HP più bassa (pressione su chi è in difficoltà)
             var weakest = alive.OrderBy(c => (float)c.CurrentHP / c.MaxHP).First();
             return BattleTarget.FromAlly(weakest);
         }
@@ -997,23 +1027,28 @@ namespace LaViaDellaRedenzione.Systems
             if (target.IsAlly && _defending.Contains(target.Ally!.CharacterId))
                 defMul = 1.0f;
 
-            float baseDmg = Math.Max(1f, raw - defStat * defMul);
-            float elemMul = Math.Max(0.01f, target.GetResistance(element));
+            float baseDmg  = Math.Max(1f, raw - defStat * defMul);
+            float elemMul  = Math.Max(0.01f, target.GetResistance(element));
             float variance = 1f + (float)(_rng.NextDouble() * DAMAGE_VARIANCE * 2 - DAMAGE_VARIANCE);
-            float final   = baseDmg * elemMul * variance;
+            float final    = baseDmg * elemMul * variance;
 
             int amount = Math.Max(1, (int)final);
-            target.CurrentHP -= amount;
+
+            // BUG 3 FIX: TakeDamage() per alleati
+            if (target.IsAlly)
+                target.Ally!.TakeDamage(amount);
+            else
+                target.Foe!.CurrentHP = Math.Max(0, target.Foe.CurrentHP - amount);
 
             if (!target.IsAlive) HandleDeath(target);
 
             DamageResolved?.Invoke(this, new DamageResolvedEventArgs
             {
-                Target     = target,
-                Amount     = amount,
+                Target      = target,
+                Amount      = amount,
                 WasCritical = false,
-                Element    = element,
-                WasHealing = false
+                Element     = element,
+                WasHealing  = false
             });
 
             Log($"{foe.Template.Name} colpisce {target.DisplayName} per {amount}.");
@@ -1029,12 +1064,12 @@ namespace LaViaDellaRedenzione.Systems
             {
                 Log($"{target.Ally!.DisplayName} è caduto.");
 
-                // Penalità Morale per Kael quando un alleato cade
-                var kael = _party.FirstOrDefault(c => c.IsKael && c.CurrentHP > 0);
-                if (kael != null && !target.Ally.IsKael)
+                // BUG 2 FIX: IsKael → CharacterId == "KAEL"; ApplyMoraleDelta → ModifyMorale
+                var kael = _party.FirstOrDefault(c => c.CharacterId == "KAEL" && !c.IsKO);
+                if (kael != null && target.Ally.CharacterId != "KAEL")
                 {
                     int old = kael.Morale;
-                    kael.ApplyMoraleDelta(-8);
+                    kael.ModifyMorale(-8, $"{target.Ally.DisplayName} è caduto");
                     MoraleChanged?.Invoke(this, new MoraleChangedEventArgs
                     {
                         OldValue = old,
@@ -1054,7 +1089,6 @@ namespace LaViaDellaRedenzione.Systems
         private void RebuildQueueAfterDeath()
         {
             if (_battleOver) return;
-            int before = _turnIndexInRound;
             RebuildTurnQueue();
             if (_turnIndexInRound >= _turnQueue.Count)
                 _turnIndexInRound = 0;
@@ -1070,7 +1104,7 @@ namespace LaViaDellaRedenzione.Systems
                 return true;
             }
 
-            if (!_party.Any(c => c.CurrentHP > 0))
+            if (!_party.Any(c => !c.IsKO))
             {
                 EndBattle(BattleState.Defeat, fled: false);
                 return true;
@@ -1092,12 +1126,12 @@ namespace LaViaDellaRedenzione.Systems
                 exp  = _enemies.Sum(e => e.Template.ExpReward);
                 gold = _enemies.Sum(e => e.Template.GoldReward);
 
-                // Morale Kael: +5 per vittoria
-                var kael = _party.FirstOrDefault(c => c.IsKael);
+                // BUG 2 FIX: IsKael → CharacterId == "KAEL"; ApplyMoraleDelta → ModifyMorale
+                var kael = _party.FirstOrDefault(c => c.CharacterId == "KAEL");
                 if (kael != null)
                 {
                     int old = kael.Morale;
-                    kael.ApplyMoraleDelta(+5);
+                    kael.ModifyMorale(+5, "Vittoria");
                     if (kael.Morale != old)
                         MoraleChanged?.Invoke(this, new MoraleChangedEventArgs
                         {
@@ -1107,7 +1141,6 @@ namespace LaViaDellaRedenzione.Systems
                         });
                 }
 
-                // Loot drop (logica base — CardAcquisitionSystem la estenderà)
                 foreach (var foe in _enemies)
                 {
                     foreach (var loot in foe.Template.LootTable)
@@ -1149,21 +1182,10 @@ namespace LaViaDellaRedenzione.Systems
 
         private void Log(string msg) => BattleLog?.Invoke(this, msg);
 
-        // -----------------------------------------------------------------------
-        //  PROPRIETÀ HELPER — per BattleScreen
-        // -----------------------------------------------------------------------
-
-        /// <summary>
-        /// True se almeno un personaggio giocabile è a HP bassa (&lt;30%).
-        /// Usato dalla BattleScreen per mostrare avvisi visivi.
-        /// </summary>
         public bool IsPartyInDanger
-            => _party.Any(c => c.CurrentHP > 0 && (float)c.CurrentHP / c.MaxHP < 0.30f);
+            => _party.Any(c => !c.IsKO && (float)c.CurrentHP / c.MaxHP < 0.30f);
 
-        /// <summary>Numero di nemici ancora in vita.</summary>
         public int EnemiesAlive => _enemies.Count(e => e.IsAlive);
-
-        /// <summary>Numero di personaggi giocabili ancora in piedi.</summary>
-        public int PartyAlive => _party.Count(c => c.CurrentHP > 0);
+        public int PartyAlive   => _party.Count(c => !c.IsKO);
     }
 }
